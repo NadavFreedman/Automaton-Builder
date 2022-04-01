@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Shapes;
 
 namespace AutomatonBuilder.Entities
@@ -50,7 +51,32 @@ namespace AutomatonBuilder.Entities
         /// </summary>
         public ModelNode? StartingNode;
 
-        public AutomatonContext()
+        public Canvas MainCanvas;
+
+
+        public void ToggleNodeStarting(ModelNode node)
+        {
+            //Toggle the starting flag.
+            node.Starting = !node.Starting;
+
+            if (node.Starting)
+            {
+                //Add the starting arrow to the canvas
+                this.MainCanvas.Children.Add(node.startingArrow);
+
+                //if there was a starting node, toggle it.
+                if (this.StartingNode != null)
+                    ToggleNodeStarting(this.StartingNode);
+
+                //Set this node to be the starting node
+                this.StartingNode = node;
+            }
+            else //Remove the starting node of the used-to-be-starting node
+                this.MainCanvas.Children.Remove(node.startingArrow);
+        }
+
+
+        public AutomatonContext(Canvas windowCanvas)
         {
             this.NodeCount = 0;
             this.StartingNode = null;
@@ -61,6 +87,7 @@ namespace AutomatonBuilder.Entities
             this.LastRightClickPosition = new Point();
             this.IsLeftMouseKeyPressed = false;
             this.StartingNode = null;
+            this.MainCanvas = windowCanvas;
         }
     }
 }

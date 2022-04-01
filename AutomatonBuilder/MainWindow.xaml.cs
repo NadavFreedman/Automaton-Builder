@@ -1,4 +1,7 @@
-﻿using AutomatonBuilder.Entities;
+﻿using AutomatonBuilder.Actions;
+using AutomatonBuilder.Actions.NodeActions;
+using AutomatonBuilder.Entities;
+using AutomatonBuilder.Entities.Actions;
 using AutomatonBuilder.Modals;
 using Microsoft.Win32;
 using Petzold.Media2D;
@@ -28,12 +31,12 @@ namespace AutomatonBuilder
     public partial class MainWindow : Window
     {
 
-        private readonly AutomatonContext context;
+        public readonly AutomatonContext context;
 
         public MainWindow()
         {
             InitializeComponent();
-            this.context = new AutomatonContext();
+            this.context = new AutomatonContext(this.MainCanvas);
         }
 
         /// <summary>
@@ -43,37 +46,8 @@ namespace AutomatonBuilder
         /// <param name="e">Event Arguments</param>
         private void AddNodeMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            //Create the new node
-            ModelNode node = new ModelNode(this.context.NodeCount++, this, this.context.LastRightClickPosition);
-
-            //Auto-set the node to the starting node if it's the only one
-            if (this.context.NodeCount == 1)
-                ToggleNodeStarting(node);
-
-            //Add the node to the Canvas
-            Canvas.SetLeft(node, context.LastRightClickPosition.X - node.Size / 2);
-            Canvas.SetTop(node, context.LastRightClickPosition.Y - node.Size / 2);
-            this.MainCanvas.Children.Add(node);
-            this.context.NodesList.Add(node);
-
-            //Add the node to each of the context menus of the existing nodes
-            foreach (var item in this.MainCanvas.Children)
-                if (item is ModelNode existingNode)
-                {
-                    existingNode.ConnectMenuItem.Items.Clear();
-                    foreach (ModelNode q in this.context.NodesList)
-                    {
-                        MenuItem menuItem = new MenuItem();
-                        menuItem.Click += ConnectNodes;
-                        //Link the node to the MenuItem
-                        menuItem.Tag = existingNode;
-                        menuItem.Header = q.ToString();
-                        existingNode.ConnectMenuItem.Items.Add(menuItem);
-                    }
-                }
-
-
-
+            IAction addNodeAction = new AddNodeAction(this.context, this);
+            addNodeAction.DoAction();
         }
 
         /// <summary>
@@ -82,84 +56,17 @@ namespace AutomatonBuilder
         /// <param name="node">The node to be removed.</param>
         public void RemoveNode(ModelNode node)
         {
-            //Decrease the index of each node that was created after the current node.
-            for (int i = this.MainCanvas.Children.Count - 1; i >= 0; i--)
-            {
-                object item = this.MainCanvas.Children[i];
-                if (item is ModelNode itemNode)
-                {
-                    if (itemNode == node)
-                        break;
-                    else
-                        itemNode.Index--;
-                }
-            }
-
-            //Remove each line connected to the node.
-            foreach (object connector in node.connectedLines)
-            {
-                MainCanvas.Children.Remove((UIElement)connector);
-                MainCanvas.Children.Remove((UIElement)((Shape)connector).Tag);
-            }
-
-            //if the node was the starting node, set it to null and remove the arrow from the screen.
-            if (node.Starting)
-            {
-                this.context.StartingNode = null;
-                this.MainCanvas.Children.Remove(node.startingArrow);
-            }
-
-            //Remove the node itself and decrease the amount of nodes on screen.
-            this.MainCanvas.Children.Remove(node);
-            this.context.NodesList.Remove(this.context.NodesList[this.context.NodesList.Count - 1]);
-            this.context.NodeCount--;
-
-            //Remove the node from the context menu of each existing node.
-            foreach (ModelNode existingNode in this.context.NodesList)
-            {
-                existingNode.ConnectMenuItem.Items.Clear();
-                foreach (ModelNode q in this.context.NodesList)
-                {
-                    MenuItem menuItem = new MenuItem();
-                    menuItem.Click += ConnectNodes;
-                    menuItem.Tag = existingNode;
-                    menuItem.Header = q.ToString();
-                    existingNode.ConnectMenuItem.Items.Add(menuItem);
-                }
-            }
+            IAction removeNodeAction = new RemoveNodeAction(this.context, this, node);
+            removeNodeAction.DoAction();
         }
 
-        /// <summary>
-        /// Toggle the node to be the starting node if it is, or vice versa.
-        /// </summary>
-        /// <param name="node">The node to be toggled.</param>
-        public void ToggleNodeStarting(ModelNode node)
-        {
-            //Toggle the starting flag.
-            node.Starting = !node.Starting;
-
-            if (node.Starting)
-            {
-                //Add the starting arrow to the canvas
-                this.MainCanvas.Children.Add(node.startingArrow);
-
-                //if there was a starting node, toggle it.
-                if (this.context.StartingNode != null)
-                    ToggleNodeStarting(this.context.StartingNode);
-
-                //Set this node to be the starting node
-                this.context.StartingNode = node;
-            }
-            else //Remove the starting node of the used-to-be-starting node
-                this.MainCanvas.Children.Remove(node.startingArrow);
-        }
 
         /// <summary>
         /// Connect the sender node to another node
         /// </summary>
         /// <param name="sender">The object which fired this event</param>
         /// <param name="e">Event Arguments</param>
-        private void ConnectNodes(object sender, RoutedEventArgs e)
+        public void ConnectNodes(object sender, RoutedEventArgs e)
         {
             string connectToName = ((MenuItem)sender).Header.ToString();
             ModelNode connectTo = null;

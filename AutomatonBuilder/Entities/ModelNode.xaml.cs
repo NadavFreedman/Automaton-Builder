@@ -99,7 +99,7 @@ namespace AutomatonBuilder.Entities
 
         private void StartingMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            this.root.ToggleNodeStarting(this);
+            this.root.context.ToggleNodeStarting(this);
         }
     }
 }
