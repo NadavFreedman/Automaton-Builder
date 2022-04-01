@@ -1,0 +1,28 @@
+﻿<Window x:Class="AutomatonBuilder.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AutomatonBuilder"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800" KeyDown="Window_KeyDown" MouseRightButtonDown="Window_MouseRightButtonDown">
+    <Canvas x:Name="MainCanvas" Background="White" MouseMove="MyCanvas_MouseMove">
+        <ToolBar x:Name="MainToolBar">
+            <Button x:Name="SaveBtn" Click="SaveBtn_Click" ToolTip="Save (Ctrl+S)">
+                <Image Source="Icons\SaveIcon.png" Width="20"/>
+            </Button>
+            <Button x:Name="UndoBtn" Click="UndoBtn_Click" ToolTip="Undo (Ctrl+Z)">
+                <Image Source="Icons\UndoIcon.png" Width="20"/>
+            </Button>
+            <Button x:Name="RedoBtn" Click="RedoBtn_Click" ToolTip="Redo (Ctrl+Y)">
+                <Image Source="Icons\RedoIcon.png" Width="20"/>
+            </Button>
+        </ToolBar>
+    </Canvas>
+    <Window.ContextMenu>
+        <ContextMenu>
+            <MenuItem x:Name="AddNodeMenuItem" Header="Add Node" Click="AddNodeMenuItem_Click"/>
+            <MenuItem x:Name="AddTextMenuItem" Header="Add Text" Click="AddTextMenuItem_Click"/>
+        </ContextMenu>
+    </Window.ContextMenu>
+</Window>
