@@ -27,58 +27,13 @@ namespace AutomatonBuilder
     /// </summary>
     public partial class MainWindow : Window
     {
-        /// <summary>
-        /// The number of nodes currently on the screen.
-        /// </summary>
-        private int nodeCount;
 
-        /// <summary>
-        /// A list containing all of the names of the nodes currently on the screen
-        /// </summary>
-        private readonly List<ModelNode> nodesList;
-
-        /// <summary>
-        /// A stack storing the lines that can be undone
-        /// </summary>
-        private readonly Stack<List<Ellipse>> UndoStack;
-
-        /// <summary>
-        /// A stack storing the lines that can be redone
-        /// </summary>
-        private readonly Stack<List<Ellipse>> RedoStack;
-
-        /// <summary>
-        /// A list containing the ellipses that are part of the current line drawn
-        /// </summary>
-        private List<Ellipse> currentLine;
-
-        /// <summary>
-        /// A flag indicating whether the left mouse button is currently pressed.
-        /// </summary>
-        private bool IsLeftMouseKeyPressed;
-
-        /// <summary>
-        /// The position in which the right click was pressed last time
-        /// </summary>
-        private Point lastRightClickPosition;
-
-        /// <summary>
-        /// The starting node
-        /// </summary>
-        private ModelNode startingNode;
+        private readonly AutomatonContext context;
 
         public MainWindow()
         {
             InitializeComponent();
-            //Initialize the fields
-            this.nodeCount = 0;
-            this.nodesList = new List<ModelNode>();
-            this.UndoStack = new Stack<List<Ellipse>>();
-            this.RedoStack = new Stack<List<Ellipse>>();
-            this.currentLine = new List<Ellipse>();
-            this.lastRightClickPosition = new Point();
-            this.IsLeftMouseKeyPressed = false;
-            this.startingNode = null;
+            this.context = new AutomatonContext();
         }
 
         /// <summary>
@@ -89,24 +44,24 @@ namespace AutomatonBuilder
         private void AddNodeMenuItem_Click(object sender, RoutedEventArgs e)
         {
             //Create the new node
-            ModelNode node = new ModelNode(this.nodeCount++, this, this.lastRightClickPosition);
+            ModelNode node = new ModelNode(this.context.NodeCount++, this, this.context.LastRightClickPosition);
 
             //Auto-set the node to the starting node if it's the only one
-            if (this.nodeCount == 1)
+            if (this.context.NodeCount == 1)
                 ToggleNodeStarting(node);
 
             //Add the node to the Canvas
-            Canvas.SetLeft(node, lastRightClickPosition.X - node.Size / 2);
-            Canvas.SetTop(node, lastRightClickPosition.Y - node.Size / 2);
+            Canvas.SetLeft(node, context.LastRightClickPosition.X - node.Size / 2);
+            Canvas.SetTop(node, context.LastRightClickPosition.Y - node.Size / 2);
             this.MainCanvas.Children.Add(node);
-            this.nodesList.Add(node);
+            this.context.NodesList.Add(node);
 
             //Add the node to each of the context menus of the existing nodes
             foreach (var item in this.MainCanvas.Children)
                 if (item is ModelNode existingNode)
                 {
                     existingNode.ConnectMenuItem.Items.Clear();
-                    foreach (ModelNode q in this.nodesList)
+                    foreach (ModelNode q in this.context.NodesList)
                     {
                         MenuItem menuItem = new MenuItem();
                         menuItem.Click += ConnectNodes;
@@ -150,20 +105,20 @@ namespace AutomatonBuilder
             //if the node was the starting node, set it to null and remove the arrow from the screen.
             if (node.Starting)
             {
-                this.startingNode = null;
+                this.context.StartingNode = null;
                 this.MainCanvas.Children.Remove(node.startingArrow);
             }
 
             //Remove the node itself and decrease the amount of nodes on screen.
             this.MainCanvas.Children.Remove(node);
-            this.nodesList.Remove(this.nodesList[this.nodesList.Count - 1]);
-            this.nodeCount--;
+            this.context.NodesList.Remove(this.context.NodesList[this.context.NodesList.Count - 1]);
+            this.context.NodeCount--;
 
             //Remove the node from the context menu of each existing node.
-            foreach (ModelNode existingNode in this.nodesList)
+            foreach (ModelNode existingNode in this.context.NodesList)
             {
                 existingNode.ConnectMenuItem.Items.Clear();
-                foreach (ModelNode q in this.nodesList)
+                foreach (ModelNode q in this.context.NodesList)
                 {
                     MenuItem menuItem = new MenuItem();
                     menuItem.Click += ConnectNodes;
@@ -189,11 +144,11 @@ namespace AutomatonBuilder
                 this.MainCanvas.Children.Add(node.startingArrow);
 
                 //if there was a starting node, toggle it.
-                if (this.startingNode != null)
-                    ToggleNodeStarting(this.startingNode);
+                if (this.context.StartingNode != null)
+                    ToggleNodeStarting(this.context.StartingNode);
 
                 //Set this node to be the starting node
-                this.startingNode = node;
+                this.context.StartingNode = node;
             }
             else //Remove the starting node of the used-to-be-starting node
                 this.MainCanvas.Children.Remove(node.startingArrow);
@@ -213,7 +168,7 @@ namespace AutomatonBuilder
             ModelNode connectFrom = (ModelNode)((MenuItem)sender).Tag;
 
             //Get the destination node.
-            foreach (ModelNode node in this.nodesList)
+            foreach (ModelNode node in this.context.NodesList)
                 if (node.ToString() == connectToName)
                 {
                     connectTo = node;
@@ -394,7 +349,7 @@ namespace AutomatonBuilder
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 //Turn on the mouse flag.
-                this.IsLeftMouseKeyPressed = true;
+                this.context.IsLeftMouseKeyPressed = true;
 
                 //Create the ellipse
                 Ellipse ellipse = new Ellipse()
@@ -419,20 +374,20 @@ namespace AutomatonBuilder
                 }
 
                 //Add the ellipse to the currently drawn line and print it to the screen.
-                this.currentLine.Add(ellipse);
+                this.context.CurrentLine.Add(ellipse);
                 MainCanvas.Children.Add(ellipse);
             }
             else
             {
                 //Turn off the mouse flag.
-                this.IsLeftMouseKeyPressed = false;
+                this.context.IsLeftMouseKeyPressed = false;
 
                 //If there was a line currently drawn, save to the Undo stack and create a new, empty line.
-                if (this.currentLine.Count != 0)
+                if (this.context.CurrentLine.Count != 0)
                 {
-                    this.RedoStack.Clear();
-                    this.UndoStack.Push(this.currentLine);
-                    this.currentLine = new List<Ellipse>();
+                    this.context.RedoStack.Clear();
+                    this.context.UndoStack.Push(this.context.CurrentLine);
+                    this.context.CurrentLine = new List<Ellipse>();
                 }
             }
         }
@@ -446,25 +401,25 @@ namespace AutomatonBuilder
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
             //If the left mouse key is pressed then don't do anything
-            if (!this.IsLeftMouseKeyPressed)
+            if (!this.context.IsLeftMouseKeyPressed)
             {
                 //If the user holds Ctrl
                 if (Keyboard.IsKeyDown(Key.LeftCtrl))
                 {
-                    if (e.Key == Key.Z && this.UndoStack.Count != 0) //Undo
+                    if (e.Key == Key.Z && this.context.UndoStack.Count != 0) //Undo
                         UndoBtn_Click(null, null);
-                    else if (e.Key == Key.Y && this.RedoStack.Count != 0) //Redo
+                    else if (e.Key == Key.Y && this.context.RedoStack.Count != 0) //Redo
                         RedoBtn_Click(null, null);
                     else if (e.Key == Key.S) //Save
                         SaveBtn_Click(null, null);
                     else if (e.Key == Key.T) //Add text
                     {
-                        this.lastRightClickPosition = Mouse.GetPosition(this.MainCanvas);
+                        this.context.LastRightClickPosition = Mouse.GetPosition(this.MainCanvas);
                         AddTextMenuItem_Click(null, null);
                     }
                     else if (e.Key == Key.N) //Add node
                     {
-                        this.lastRightClickPosition = Mouse.GetPosition(this.MainCanvas);
+                        this.context.LastRightClickPosition = Mouse.GetPosition(this.MainCanvas);
                         AddNodeMenuItem_Click(null, null);
                     }
                 }
@@ -527,8 +482,8 @@ namespace AutomatonBuilder
             border.ContextMenu.Items.Add(removeTextItem);
 
             //Add the block to the canvas
-            Canvas.SetLeft(border, lastRightClickPosition.X - 2 - formattedText.Width / 2);
-            Canvas.SetTop(border, lastRightClickPosition.Y - 2 - formattedText.Height / 2);
+            Canvas.SetLeft(border, context.LastRightClickPosition.X - 2 - formattedText.Width / 2);
+            Canvas.SetTop(border, context.LastRightClickPosition.Y - 2 - formattedText.Height / 2);
             this.MainCanvas.Children.Add(border);
         }
 
@@ -539,7 +494,7 @@ namespace AutomatonBuilder
         /// <param name="e">Event Arguments</param>
         private void Window_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            this.lastRightClickPosition = Mouse.GetPosition(this.MainCanvas);
+            this.context.LastRightClickPosition = Mouse.GetPosition(this.MainCanvas);
         }
 
 
@@ -591,11 +546,11 @@ namespace AutomatonBuilder
         /// <param name="e">Event Arguments</param>
         private void UndoBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (this.UndoStack.Count != 0)
+            if (this.context.UndoStack.Count != 0)
             {
                 //Remove the line 
-                List<Ellipse> linesToRemove = this.UndoStack.Pop();
-                this.RedoStack.Push(linesToRemove);
+                List<Ellipse> linesToRemove = this.context.UndoStack.Pop();
+                this.context.RedoStack.Push(linesToRemove);
                 foreach (Ellipse lineToRemove in linesToRemove)
                     this.MainCanvas.Children.Remove(lineToRemove);
             }
@@ -608,11 +563,11 @@ namespace AutomatonBuilder
         /// <param name="e">Event Arguments</param>
         private void RedoBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (this.RedoStack.Count != 0)
+            if (this.context.RedoStack.Count != 0)
             {
                 //Redo the line
-                List<Ellipse> linesToAdd = this.RedoStack.Pop();
-                this.UndoStack.Push(linesToAdd);
+                List<Ellipse> linesToAdd = this.context.RedoStack.Pop();
+                this.context.UndoStack.Push(linesToAdd);
                 foreach (Ellipse lineToRemove in linesToAdd)
                     this.MainCanvas.Children.Add(lineToRemove);
             }
