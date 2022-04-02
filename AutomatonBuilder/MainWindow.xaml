@@ -9,16 +9,55 @@
     <Canvas x:Name="MainCanvas" Background="White" MouseMove="MyCanvas_MouseMove">
         <ToolBar x:Name="MainToolBar">
             <Button x:Name="SaveBtn" Click="SaveBtn_Click" ToolTip="Save (Ctrl+S)">
-                <Image Source="Icons\SaveIcon.png" Width="20"/>
+                <Image Source="Icons\SaveIcon.png" Width="20">
+                    <Image.Style>
+                        <Style TargetType="Image">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.5" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Image.Style>
+                </Image>
             </Button>
-            <Button x:Name="UndoBtn" Click="UndoBtn_Click" ToolTip="Undo (Ctrl+Z)">
-                <Image Source="Icons\UndoIcon.png" Width="20"/>
+            <Button x:Name="UndoBtn" Click="UndoBtn_Click" ToolTip="Undo (Ctrl+Z)" IsEnabled="False">
+                <Image Source="Icons\UndoIcon.png" Width="20">
+                    <Image.Style>
+                        <Style TargetType="Image">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.25" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Image.Style>
+                </Image>
             </Button>
-            <Button x:Name="RedoBtn" Click="RedoBtn_Click" ToolTip="Redo (Ctrl+Y)">
-                <Image Source="Icons\RedoIcon.png" Width="20"/>
+            <Button x:Name="RedoBtn" Click="RedoBtn_Click" ToolTip="Redo (Ctrl+Y)" IsEnabled="False">
+                <Image Source="Icons\RedoIcon.png" Width="20">
+                    <Image.Style>
+                        <Style TargetType="Image">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.25"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Image.Style>
+                </Image>
             </Button>
         </ToolBar>
     </Canvas>
+    <Window.Resources>
+        <Style x:Key="ImageEnabled" TargetType="Image">
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.25"></Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
     <Window.ContextMenu>
         <ContextMenu>
             <MenuItem x:Name="AddNodeMenuItem" Header="Add Node" Click="AddNodeMenuItem_Click"/>
