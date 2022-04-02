@@ -12,11 +12,6 @@ namespace AutomatonBuilder.Entities
     public class AutomatonContext
     {
         /// <summary>
-        /// The number of nodes currently on the screen.
-        /// </summary>
-        public int NodeCount;
-
-        /// <summary>
         /// A list containing all of the nodes currently on the screen
         /// </summary>
         public readonly List<ModelNode> NodesList;
@@ -24,12 +19,12 @@ namespace AutomatonBuilder.Entities
         /// <summary>
         /// A stack storing the lines that can be undone
         /// </summary>
-        public readonly Stack<List<Ellipse>> UndoStack;
+        public readonly Stack<IAction> DoneActionsStack;
 
         /// <summary>
         /// A stack storing the lines that can be redone
         /// </summary>
-        public readonly Stack<List<Ellipse>> RedoStack;
+        public readonly Stack<IAction> UndoneActionsStack;
 
         /// <summary>
         /// A list containing the ellipses that are part of the current line drawn
@@ -54,35 +49,13 @@ namespace AutomatonBuilder.Entities
         public Canvas MainCanvas;
 
 
-        public void ToggleNodeStarting(ModelNode node)
-        {
-            //Toggle the starting flag.
-            node.Starting = !node.Starting;
-
-            if (node.Starting)
-            {
-                //Add the starting arrow to the canvas
-                this.MainCanvas.Children.Add(node.startingArrow);
-
-                //if there was a starting node, toggle it.
-                if (this.StartingNode != null)
-                    ToggleNodeStarting(this.StartingNode);
-
-                //Set this node to be the starting node
-                this.StartingNode = node;
-            }
-            else //Remove the starting node of the used-to-be-starting node
-                this.MainCanvas.Children.Remove(node.startingArrow);
-        }
-
 
         public AutomatonContext(Canvas windowCanvas)
         {
-            this.NodeCount = 0;
             this.StartingNode = null;
             this.NodesList = new List<ModelNode>();
-            this.RedoStack = new Stack<List<Ellipse>>();
-            this.UndoStack = new Stack<List<Ellipse>>();
+            this.UndoneActionsStack = new Stack<IAction>();
+            this.DoneActionsStack = new Stack<IAction>();
             this.CurrentLine = new List<Ellipse>();
             this.LastRightClickPosition = new Point();
             this.IsLeftMouseKeyPressed = false;
