@@ -2,6 +2,7 @@
 using AutomatonBuilder.Actions.NodeActions;
 using AutomatonBuilder.Entities;
 using AutomatonBuilder.Entities.Actions;
+using AutomatonBuilder.Entities.Actions.TextActions;
 using AutomatonBuilder.Modals;
 using Microsoft.Win32;
 using Petzold.Media2D;
@@ -48,11 +49,7 @@ namespace AutomatonBuilder
         private void AddNodeMenuItem_Click(object sender, RoutedEventArgs e)
         {
             IAction addNodeAction = new AddNodeAction(this.context, this);
-            addNodeAction.DoAction();
-            this.context.DoneActionsStack.Push(addNodeAction);
-            this.context.UndoneActionsStack.Clear();
-            this.RedoBtn.IsEnabled = false;
-            this.UndoBtn.IsEnabled = true;
+            DoAction(addNodeAction);
         }
 
         /// <summary>
@@ -62,11 +59,7 @@ namespace AutomatonBuilder
         public void RemoveNode(ModelNode node)
         {
             IAction removeNodeAction = new RemoveNodeAction(this.context, this, node);
-            removeNodeAction.DoAction();
-            this.context.DoneActionsStack.Push(removeNodeAction);
-            this.context.UndoneActionsStack.Clear();
-            this.RedoBtn.IsEnabled = false;
-            this.UndoBtn.IsEnabled = true;
+            DoAction(removeNodeAction);
         }
 
 
@@ -245,13 +238,21 @@ namespace AutomatonBuilder
         /// </summary>
         /// <param name="sender">The object which fired this event</param>
         /// <param name="e">Event Arguments</param>
-        private void RemoveConnector_Click(object sender, RoutedEventArgs e)
+        public void RemoveConnector_Click(object sender, RoutedEventArgs e)
         {
             UIElement connector = (UIElement)((MenuItem)sender).Tag;
             this.MainCanvas.Children.Remove(connector);
             if (connector is Shape s)
                 if (s.Tag != null)
                     MainCanvas.Children.Remove((UIElement)s.Tag);
+        }
+
+        public void RemoveText_Click(object sender, RoutedEventArgs e)
+        {
+            Border box = (Border)((MenuItem)sender).Tag;
+            IAction removeText = new RemoveTextAction(this.context, box);
+            DoAction(removeText);
+
         }
 
         /// <summary>
@@ -363,48 +364,8 @@ namespace AutomatonBuilder
             else
                 return;
 
-            //Create a text block
-            TextBlock lineTextBlock = new TextBlock
-            {
-                Background = Brushes.White,
-                Text = input,
-                Margin = new Thickness(3)
-            };
-
-            //Create a border
-            Border border = new Border
-            {
-                BorderBrush = Brushes.Black,
-                BorderThickness = new Thickness(1),
-                Background = Brushes.White,
-                Child = lineTextBlock
-            };
-
-            //Calculate the size of the text block
-            var formattedText = new FormattedText(
-                                        input,
-                                        CultureInfo.CurrentCulture,
-                                        FlowDirection.LeftToRight,
-                                        new Typeface(lineTextBlock.FontFamily, lineTextBlock.FontStyle, lineTextBlock.FontWeight, lineTextBlock.FontStretch),
-                                        lineTextBlock.FontSize,
-                                        Brushes.Black,
-                                        new NumberSubstitution(),
-                                        1);
-
-            //Add a context menu to the text block
-            border.ContextMenu = new ContextMenu();
-            MenuItem removeTextItem = new MenuItem
-            {
-                Header = "Remove",
-                Tag = border
-            };
-            removeTextItem.Click += RemoveConnector_Click;
-            border.ContextMenu.Items.Add(removeTextItem);
-
-            //Add the block to the canvas
-            Canvas.SetLeft(border, context.LastRightClickPosition.X - 2 - formattedText.Width / 2);
-            Canvas.SetTop(border, context.LastRightClickPosition.Y - 2 - formattedText.Height / 2);
-            this.MainCanvas.Children.Add(border);
+            IAction addTextAction = new AddTextAction(this.context, input, this);
+            DoAction(addTextAction);
         }
 
         /// <summary>
@@ -497,6 +458,15 @@ namespace AutomatonBuilder
             {
                 this.RedoBtn.IsEnabled = false;
             }
+        }
+
+        private void DoAction(IAction action)
+        {
+            action.DoAction();
+            this.context.DoneActionsStack.Push(action);
+            this.context.UndoneActionsStack.Clear();
+            this.RedoBtn.IsEnabled = false;
+            this.UndoBtn.IsEnabled = true;
         }
     }
 }

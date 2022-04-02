@@ -113,7 +113,7 @@ namespace AutomatonBuilder.Utils
 
             //Remove the node itself and decrease the amount of nodes on screen.
             context.MainCanvas.Children.Remove(nodeToRemove);
-            context.NodesList.Remove(context.NodesList[context.NodesList.Count - 1]);
+            context.NodesList.Remove(nodeToRemove);
 
             //Remove the node from the context menu of each existing node.
             context.SetNodesContextMenuOptions(host);
