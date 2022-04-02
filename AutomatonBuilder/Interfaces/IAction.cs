@@ -10,6 +10,8 @@ namespace AutomatonBuilder.Entities
     {
         public void DoAction();
 
+        public void RedoAction();
+
         public void UndoAction();
     }
 }
