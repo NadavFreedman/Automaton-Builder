@@ -37,6 +37,7 @@ namespace AutomatonBuilder
         {
             InitializeComponent();
             this.context = new AutomatonContext(this.MainCanvas);
+            this.WindowState = WindowState.Maximized;
         }
 
         /// <summary>
@@ -48,6 +49,10 @@ namespace AutomatonBuilder
         {
             IAction addNodeAction = new AddNodeAction(this.context, this);
             addNodeAction.DoAction();
+            this.context.DoneActionsStack.Push(addNodeAction);
+            this.context.UndoneActionsStack.Clear();
+            this.RedoBtn.IsEnabled = false;
+            this.UndoBtn.IsEnabled = true;
         }
 
         /// <summary>
@@ -58,6 +63,10 @@ namespace AutomatonBuilder
         {
             IAction removeNodeAction = new RemoveNodeAction(this.context, this, node);
             removeNodeAction.DoAction();
+            this.context.DoneActionsStack.Push(removeNodeAction);
+            this.context.UndoneActionsStack.Clear();
+            this.RedoBtn.IsEnabled = false;
+            this.UndoBtn.IsEnabled = true;
         }
 
 
@@ -292,9 +301,13 @@ namespace AutomatonBuilder
                 //If there was a line currently drawn, save to the Undo stack and create a new, empty line.
                 if (this.context.CurrentLine.Count != 0)
                 {
-                    this.context.RedoStack.Clear();
-                    this.context.UndoStack.Push(this.context.CurrentLine);
+                    IAction drawingAction = new DrawLineAction(context);
                     this.context.CurrentLine = new List<Ellipse>();
+                    this.context.DoneActionsStack.Push(drawingAction);
+                    this.context.UndoneActionsStack.Clear();
+                    this.RedoBtn.IsEnabled = false;
+                    this.UndoBtn.IsEnabled = true;
+
                 }
             }
         }
@@ -313,9 +326,9 @@ namespace AutomatonBuilder
                 //If the user holds Ctrl
                 if (Keyboard.IsKeyDown(Key.LeftCtrl))
                 {
-                    if (e.Key == Key.Z && this.context.UndoStack.Count != 0) //Undo
+                    if (e.Key == Key.Z && this.context.DoneActionsStack.Count != 0) //Undo
                         UndoBtn_Click(null, null);
-                    else if (e.Key == Key.Y && this.context.RedoStack.Count != 0) //Redo
+                    else if (e.Key == Key.Y && this.context.UndoneActionsStack.Count != 0) //Redo
                         RedoBtn_Click(null, null);
                     else if (e.Key == Key.S) //Save
                         SaveBtn_Click(null, null);
@@ -453,13 +466,16 @@ namespace AutomatonBuilder
         /// <param name="e">Event Arguments</param>
         private void UndoBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (this.context.UndoStack.Count != 0)
+            if (this.context.DoneActionsStack.Count != 0)
             {
-                //Remove the line 
-                List<Ellipse> linesToRemove = this.context.UndoStack.Pop();
-                this.context.RedoStack.Push(linesToRemove);
-                foreach (Ellipse lineToRemove in linesToRemove)
-                    this.MainCanvas.Children.Remove(lineToRemove);
+                IAction actionToUndo = this.context.DoneActionsStack.Pop();
+                actionToUndo.UndoAction();
+                this.context.UndoneActionsStack.Push(actionToUndo);
+                this.RedoBtn.IsEnabled = true;
+            }
+            if (this.context.DoneActionsStack.Count == 0)
+            {
+                this.UndoBtn.IsEnabled = false;
             }
         }
 
@@ -470,13 +486,16 @@ namespace AutomatonBuilder
         /// <param name="e">Event Arguments</param>
         private void RedoBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (this.context.RedoStack.Count != 0)
+            if (this.context.UndoneActionsStack.Count != 0)
             {
-                //Redo the line
-                List<Ellipse> linesToAdd = this.context.RedoStack.Pop();
-                this.context.UndoStack.Push(linesToAdd);
-                foreach (Ellipse lineToRemove in linesToAdd)
-                    this.MainCanvas.Children.Add(lineToRemove);
+                IAction actionToRedo = this.context.UndoneActionsStack.Pop();
+                actionToRedo.RedoAction();
+                this.context.DoneActionsStack.Push(actionToRedo);
+                this.UndoBtn.IsEnabled = true;
+            }
+            if (this.context.UndoneActionsStack.Count == 0)
+            {
+                this.RedoBtn.IsEnabled = false;
             }
         }
     }
