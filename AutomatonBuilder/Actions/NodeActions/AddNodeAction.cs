@@ -1,4 +1,5 @@
 ﻿using AutomatonBuilder.Entities;
+using AutomatonBuilder.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace AutomatonBuilder.Actions.NodeActions
     {
         private readonly AutomatonContext context;
         private readonly MainWindow host;
+        private ModelNode? createdNode;
 
         public AddNodeAction(AutomatonContext context, MainWindow host)
         {
@@ -21,38 +23,17 @@ namespace AutomatonBuilder.Actions.NodeActions
 
         public void DoAction()
         {
-            //Create the new node
-            ModelNode node = new(this.context.NodeCount++, this.host, this.context.LastRightClickPosition);
+            this.createdNode = this.context.CreateAndAddNode(this.host);
+        }
 
-            //Auto-set the node to the starting node if it's the only one
-            if (this.context.NodeCount == 1)
-                this.context.ToggleNodeStarting(node);
-
-            //Add the node to the Canvas
-            Canvas.SetLeft(node, context.LastRightClickPosition.X - node.Size / 2);
-            Canvas.SetTop(node, context.LastRightClickPosition.Y - node.Size / 2);
-            this.context.MainCanvas.Children.Add(node);
-            this.context.NodesList.Add(node);
-
-            //Add the node to each of the context menus of the existing nodes
-            foreach (ModelNode changedNode in this.context.NodesList)
-            {
-                changedNode.ConnectMenuItem.Items.Clear();
-                foreach (ModelNode q in this.context.NodesList)
-                {
-                    MenuItem menuItem = new();
-                    menuItem.Click += this.host.ConnectNodes;
-                    //Link the node to the MenuItem
-                    menuItem.Tag = changedNode;
-                    menuItem.Header = q.ToString();
-                    changedNode.ConnectMenuItem.Items.Add(menuItem);
-                }
-            }
+        public void RedoAction()
+        {
+            this.context.AddNode(this.createdNode!, this.host);
         }
 
         public void UndoAction()
         {
-            throw new NotImplementedException();
+            this.context.RemoveNode(this.createdNode!, this.host);
         }
     }
 }

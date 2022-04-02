@@ -1,4 +1,5 @@
-﻿using Petzold.Media2D;
+﻿using AutomatonBuilder.Utils;
+using Petzold.Media2D;
 using System;
 using System.Collections.Generic;
 using System.Linq;
