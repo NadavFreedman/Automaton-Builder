@@ -4,6 +4,7 @@ using AutomatonBuilder.Entities;
 using AutomatonBuilder.Entities.Actions;
 using AutomatonBuilder.Entities.Actions.TextActions;
 using AutomatonBuilder.Modals;
+using AutomatonBuilder.Utils;
 using Microsoft.Win32;
 using Petzold.Media2D;
 using System;
@@ -84,153 +85,17 @@ namespace AutomatonBuilder
                     break;
                 }
 
-            //The position of the Text Block
-            Point lineTextPoint = new Point();
-
             //Get the Text to be written on the arrow
             ConnectorInput connectorInputWindow = new ConnectorInput(connectFrom.ToString(), connectTo.ToString());
             connectorInputWindow.ShowDialog();
-            string input = "";
+            string input;
             if (connectorInputWindow.DialogResult == true)
                 input = connectorInputWindow.Input;
             else
                 return;
 
-            //Build the Text Block
-            TextBlock lineTextBlock = new TextBlock
-            {
-                Background = Brushes.White,
-                Text = input,
-                Margin = new Thickness(3)
-            };
-
-            //Build the border of the block
-            Border border = new Border
-            {
-                BorderBrush = Brushes.Black,
-                BorderThickness = new Thickness(1),
-                Background = Brushes.White,
-                Child = lineTextBlock
-            };
-
-            //Calculate the size of the block roughly.
-            var formattedText = new FormattedText(
-                                        input,
-                                        CultureInfo.CurrentCulture,
-                                        FlowDirection.LeftToRight,
-                                        new Typeface(lineTextBlock.FontFamily, lineTextBlock.FontStyle, lineTextBlock.FontWeight, lineTextBlock.FontStretch),
-                                        lineTextBlock.FontSize,
-                                        Brushes.Black,
-                                        new NumberSubstitution(),
-                                        1);
-
-
-            //If the node needs to be connected to itself
-            if (connectFrom.Position.X == connectTo.Position.X && connectTo.Position.Y == connectFrom.Position.Y)
-            {
-                //Create the ellipse and add it to the canvas. 
-                Ellipse connectorEllipse = new Ellipse
-                {
-                    Width = 50,
-                    Height = 50,
-                    Stroke = Brushes.Black,
-                    StrokeThickness = 3,
-                    Visibility = Visibility.Visible
-                };
-                Canvas.SetLeft(connectorEllipse, connectFrom.Position.X - 45);
-                Canvas.SetTop(connectorEllipse, connectFrom.Position.Y - 45);
-                connectFrom.connectedLines.Add(connectorEllipse);
-
-                //Add a context menu to the ellipse
-                MenuItem removeConnector = new MenuItem
-                {
-                    Header = "Remove",
-                    Tag = connectorEllipse
-                };
-                removeConnector.Click += RemoveConnector_Click;
-                connectorEllipse.ContextMenu = new ContextMenu();
-                connectorEllipse.ContextMenu.Items.Add(removeConnector);
-
-                //Add a context menu to the text block
-                MenuItem removeConnector1 = new MenuItem
-                {
-                    Header = "Remove",
-                    Tag = border
-                };
-                removeConnector1.Click += RemoveConnector_Click;
-                border.ContextMenu = new ContextMenu();
-                border.ContextMenu.Items.Add(removeConnector1);
-
-                //Calculate the location of the block
-                lineTextPoint = new Point(connectFrom.Position.X - 45, connectFrom.Position.Y - 45);
-
-                //Insert the line at the bottom of the canvas (Z-axis wise)
-                MainCanvas.Children.Insert(0, connectorEllipse);
-
-                //Connect the border to the ellipse for future removal
-                connectorEllipse.Tag = border;
-            }
-            else
-            {
-                //Calculate the positions of the arrow.
-                double deltaX = connectTo.Position.X - connectFrom.Position.X;
-                double deltaY = connectTo.Position.Y - connectFrom.Position.Y;
-                double alpha = Math.Atan(deltaY / deltaX);
-                if (deltaX < 0 && deltaY < 0 || deltaY > 0 && deltaX < 0)
-                    alpha -= Math.PI;
-                ArrowLine connector = new ArrowLine
-                {
-                    Visibility = Visibility.Visible,
-                    StrokeThickness = 3,
-                    Stroke = Brushes.Black,
-
-                    X1 = connectFrom.Position.X,
-                    Y1 = connectFrom.Position.Y,
-
-                    X2 = connectTo.Position.X - Math.Cos(alpha) * (connectTo.Size / 2),
-                    Y2 = connectTo.Position.Y - Math.Sin(alpha) * (connectTo.Size / 2)
-                };
-
-
-
-                //Add a context menu to the arrow
-                MenuItem removeConnector1 = new MenuItem
-                {
-                    Header = "Remove",
-                    Tag = connector
-                };
-                removeConnector1.Click += RemoveConnector_Click;
-                connector.ContextMenu = new ContextMenu();
-                connector.ContextMenu.Items.Add(removeConnector1);
-
-                //Add a context menu to the text block
-                MenuItem removeConnector = new MenuItem
-                {
-                    Header = "Remove",
-                    Tag = border
-                };
-                removeConnector.Click += RemoveConnector_Click;
-                border.ContextMenu = new ContextMenu();
-                border.ContextMenu.Items.Add(removeConnector);
-
-                //Add the line to both of the nodes for future removal
-                connectFrom.connectedLines.Add(connector);
-                connectTo.connectedLines.Add(connector);
-
-                //Insert the line at the bottom of the Canvas
-                this.MainCanvas.Children.Insert(0, connector);
-
-                //calculate the middle point of the line
-                lineTextPoint = new Point(connectFrom.Position.X + deltaX / 2, connectFrom.Position.Y + deltaY / 2);
-
-                //Connect the line to the border for future removal
-                connector.Tag = border;
-            }
-
-            //Add the text to the canvas
-            Canvas.SetLeft(border, lineTextPoint.X - 2 - formattedText.Width / 2);
-            Canvas.SetTop(border, lineTextPoint.Y - 2 - formattedText.Height / 2);
-            this.MainCanvas.Children.Add(border);
+            IAction connectAction = new ConnectNodesAction(this.context, connectFrom, connectTo, input, this);
+            DoAction(connectAction);
         }
 
         /// <summary>
@@ -241,10 +106,8 @@ namespace AutomatonBuilder
         public void RemoveConnector_Click(object sender, RoutedEventArgs e)
         {
             UIElement connector = (UIElement)((MenuItem)sender).Tag;
-            this.MainCanvas.Children.Remove(connector);
-            if (connector is Shape s)
-                if (s.Tag != null)
-                    MainCanvas.Children.Remove((UIElement)s.Tag);
+            IAction disconnectAction = new DisconnectNodesAction(this.context, connector);
+            DoAction(disconnectAction);
         }
 
         public void RemoveText_Click(object sender, RoutedEventArgs e)

@@ -1,4 +1,5 @@
 ﻿using AutomatonBuilder.Entities;
+using Petzold.Media2D;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace AutomatonBuilder.Utils
@@ -72,7 +74,7 @@ namespace AutomatonBuilder.Utils
             //Add each line connected to the node.
             foreach (object connector in nodeToAdd.connectedLines)
             {
-                context.MainCanvas.Children.Add((UIElement)connector);
+                context.MainCanvas.Children.Insert(0, (UIElement)connector);
                 context.MainCanvas.Children.Add((UIElement)((Shape)connector).Tag);
             }
 
