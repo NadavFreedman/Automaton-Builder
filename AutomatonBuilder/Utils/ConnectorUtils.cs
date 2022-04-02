@@ -82,7 +82,7 @@ namespace AutomatonBuilder.Utils
 
             //calculate the middle point of the line
             Point textCoords = new(connectFrom.Position.X + deltaX / 2, connectFrom.Position.Y + deltaY / 2);
-            SetPositionForText(connector, border, formattedText, textCoords);
+            SetPositionForText(border, formattedText, textCoords);
 
             //Add the text to the canvas
             ReconnectConnector(context, connector, connectFrom, connectTo);
@@ -110,7 +110,7 @@ namespace AutomatonBuilder.Utils
 
             SetPositionForEllipseConnector(connectorEllipse, node);
             Point textCoords = new(node.Position.X - node.Size / 2, node.Position.Y - node.Size / 2);
-            SetPositionForText(connectorEllipse, border, formattedText, textCoords);
+            SetPositionForText(border, formattedText, textCoords);
             ReconnectConnector(context, connectorEllipse, node);
 
             return connectorEllipse;
@@ -135,21 +135,12 @@ namespace AutomatonBuilder.Utils
 
         public static void AddConnectorAndTextToCanvas(Canvas mainCanvas, UIElement connector)
         {
-            UIElement taggedElement = ((FrameworkElement)connector).Tag as UIElement;
-            if (taggedElement is Border)
-            {
-                mainCanvas.Children.Insert(0, connector);
-                AddTextToCanvas(mainCanvas, taggedElement);
-            }
-            else
-            {
-                mainCanvas.Children.Insert(0, taggedElement);
-                AddTextToCanvas(mainCanvas, connector);
-            }
-            
+            Border taggedElement = ((FrameworkElement)connector).Tag as Border;
+            mainCanvas.Children.Insert(0, connector);
+            AddTextToCanvas(mainCanvas, taggedElement);
         }
 
-        private static void SetPositionForText(UIElement connector, Border text, FormattedText formattedText, Point textCoords)
+        private static void SetPositionForText(Border text, FormattedText formattedText, Point textCoords)
         {
             Canvas.SetLeft(text, textCoords.X - 2 - formattedText.Width / 2);
             Canvas.SetTop(text, textCoords.Y - 2 - formattedText.Height / 2);
@@ -163,16 +154,20 @@ namespace AutomatonBuilder.Utils
 
         public static void ReconnectConnector(AutomatonContext context, UIElement connector, ModelNode source, ModelNode? destination = null)
         {
+            UIElement taggedElement = ((FrameworkElement)connector).Tag as UIElement;
+
+            UIElement line = taggedElement is not Border ? taggedElement : connector;
+
             if (destination == null)
             {
-                source.connectedLines.Add(connector);
+                source.connectedLines.Add(line);
             }
             else
             {
-                source.connectedLines.Add(connector);
-                destination.connectedLines.Add(connector);
+                source.connectedLines.Add(line);
+                destination.connectedLines.Add(line);
             }
-            AddConnectorAndTextToCanvas(context.MainCanvas, connector);
+            AddConnectorAndTextToCanvas(context.MainCanvas, line);
         }
 
     }
