@@ -3,6 +3,7 @@ using AutomatonBuilder.Actions.NodeActions;
 using AutomatonBuilder.Entities;
 using AutomatonBuilder.Entities.Actions;
 using AutomatonBuilder.Entities.Actions.TextActions;
+using AutomatonBuilder.Interfaces;
 using AutomatonBuilder.Modals;
 using AutomatonBuilder.Utils;
 using Microsoft.Win32;
@@ -105,7 +106,7 @@ namespace AutomatonBuilder
         /// <param name="e">Event Arguments</param>
         public void RemoveConnector_Click(object sender, RoutedEventArgs e)
         {
-            UIElement connector = (UIElement)((MenuItem)sender).Tag;
+            IConnector connector = (IConnector)((MenuItem)sender).Tag;
             IAction disconnectAction = new DisconnectNodesAction(this.context, connector);
             DoAction(disconnectAction);
         }
@@ -131,31 +132,42 @@ namespace AutomatonBuilder
                 //Turn on the mouse flag.
                 this.context.IsLeftMouseKeyPressed = true;
 
-                //Create the ellipse
-                Ellipse ellipse = new Ellipse()
+                if (this.context.HoveredElement == null)
                 {
-                    Fill = Brushes.Black,
-                    Width = 6,
-                    Height = 6,
-                };
+                    //Create the ellipse
+                    Ellipse ellipse = new Ellipse()
+                    {
+                        Fill = Brushes.Black,
+                        Width = 6,
+                        Height = 6,
+                    };
 
-                //Set the coordinates of the ellipse.
-                Canvas.SetLeft(ellipse, e.GetPosition(this).X - 3);
-                Canvas.SetTop(ellipse, e.GetPosition(this).Y - 3);
+                    //Set the coordinates of the ellipse.
+                    Canvas.SetLeft(ellipse, e.GetPosition(this).X - 3);
+                    Canvas.SetTop(ellipse, e.GetPosition(this).Y - 3);
 
-                //If Ctrl is held then it's removal
-                if (Keyboard.IsKeyDown(Key.LeftCtrl))
-                {
-                    ellipse.Fill = Brushes.White;
-                    ellipse.Width = 20;
-                    ellipse.Height = 20;
-                    Canvas.SetLeft(ellipse, e.GetPosition(this).X - 10);
-                    Canvas.SetTop(ellipse, e.GetPosition(this).Y - 10);
+                    //If Ctrl is held then it's removal
+                    if (Keyboard.IsKeyDown(Key.LeftCtrl))
+                    {
+                        ellipse.Fill = Brushes.White;
+                        ellipse.Width = 20;
+                        ellipse.Height = 20;
+                        Canvas.SetLeft(ellipse, e.GetPosition(this).X - 10);
+                        Canvas.SetTop(ellipse, e.GetPosition(this).Y - 10);
+                    }
+
+                    //Add the ellipse to the currently drawn line and print it to the screen.
+                    this.context.CurrentLine.Add(ellipse);
+                    MainCanvas.Children.Add(ellipse);
                 }
-
-                //Add the ellipse to the currently drawn line and print it to the screen.
-                this.context.CurrentLine.Add(ellipse);
-                MainCanvas.Children.Add(ellipse);
+                else
+                {
+                    if (this.context.HoveredElement is ModelNode node)
+                    {
+                        node.SetPosition(e.GetPosition(this));
+                    }
+                }
+                
             }
             else
             {
@@ -166,14 +178,24 @@ namespace AutomatonBuilder
                 if (this.context.CurrentLine.Count != 0)
                 {
                     IAction drawingAction = new DrawLineAction(context);
-                    this.context.CurrentLine = new List<Ellipse>();
-                    this.context.DoneActionsStack.Push(drawingAction);
-                    this.context.UndoneActionsStack.Clear();
-                    this.RedoBtn.IsEnabled = false;
-                    this.UndoBtn.IsEnabled = true;
+                    context.CurrentLine = new List<Ellipse>();
+                    DoAction(drawingAction);
 
                 }
             }
+        }
+
+        public void Element_MouseEnter(object sender, MouseEventArgs e)
+        {
+            UIElement hovered = (UIElement)sender;
+            this.context.HoveredElement = hovered;
+            Title = $"{this.context.HoveredElement}";
+        }
+
+        public void Element_MouseLeave(object sender, MouseEventArgs e)
+        {
+            this.context.HoveredElement = null;
+            Title = $"{this.context.HoveredElement}";
         }
 
 

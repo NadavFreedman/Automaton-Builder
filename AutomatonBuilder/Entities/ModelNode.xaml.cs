@@ -1,4 +1,5 @@
-﻿using AutomatonBuilder.Utils;
+﻿using AutomatonBuilder.Interfaces;
+using AutomatonBuilder.Utils;
 using Petzold.Media2D;
 using System;
 using System.Collections.Generic;
@@ -34,7 +35,9 @@ namespace AutomatonBuilder.Entities
 
         public Point Position;
 
-        public List<object> connectedLines;
+        public List<IConnector> connectedLinesToThisNode;
+        public List<IConnector> connectedLinesFromThisNode;
+
 
         private int index;
         public int Index { get { return index; } set { this.index = value; this.IndexText.Text = this.index.ToString(); } }
@@ -63,7 +66,8 @@ namespace AutomatonBuilder.Entities
                 Y2 = pos.Y + 25
             };
 
-            this.connectedLines = new List<object>();
+            this.connectedLinesToThisNode = new List<IConnector>();
+            this.connectedLinesFromThisNode = new List<IConnector>();
         }
 
         public void Resize(int size)
@@ -81,6 +85,27 @@ namespace AutomatonBuilder.Entities
         public override string ToString()
         {
             return string.Format("q{0}", this.index);
+        }
+
+        public void SetPosition(Point newPosition)
+        {
+            this.Position = newPosition;
+            this.startingArrow.X1 = newPosition.X - 45;
+            this.startingArrow.Y1 = newPosition.Y + 45;
+            this.startingArrow.X2 = newPosition.X - 25;
+            this.startingArrow.Y2 = newPosition.Y + 25;
+
+            Canvas.SetLeft(this, this.Position.X - this.Size / 2);
+            Canvas.SetTop(this, this.Position.Y - this.Size / 2);
+
+            foreach(IConnector connector in this.connectedLinesToThisNode)
+            {
+                connector.SetConnectorEnd(newPosition);
+            }
+            foreach (IConnector connector in this.connectedLinesFromThisNode)
+            {
+                connector.SetConnectorStart(newPosition);
+            }
         }
 
         private void AcceptingClick(object sender, RoutedEventArgs e)

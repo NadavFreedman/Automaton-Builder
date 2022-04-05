@@ -45,6 +45,12 @@ namespace AutomatonBuilder.Utils
                                      1);
         }
 
+        public static void SetPositionForText(Border text, FormattedText formattedText, Point textCoords)
+        {
+            Canvas.SetLeft(text, textCoords.X - 2 - formattedText.Width / 2);
+            Canvas.SetTop(text, textCoords.Y - 2 - formattedText.Height / 2);
+        }
+
         public static void RemoveTextBoxFromCanvas(Border box, Canvas mainCanvas)
         {
             mainCanvas.Children.Remove(box);

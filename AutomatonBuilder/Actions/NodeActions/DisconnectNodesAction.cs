@@ -1,4 +1,5 @@
 ﻿using AutomatonBuilder.Entities;
+using AutomatonBuilder.Interfaces;
 using AutomatonBuilder.Utils;
 using System;
 using System.Collections.Generic;
@@ -12,10 +13,10 @@ namespace AutomatonBuilder.Actions.NodeActions
     public class DisconnectNodesAction : IAction
     {
         private AutomatonContext context;
-        private readonly UIElement connector;
+        private readonly IConnector connector;
         private List<ModelNode>? disconnectedNodes;
 
-        public DisconnectNodesAction(AutomatonContext context, UIElement connector)
+        public DisconnectNodesAction(AutomatonContext context, IConnector connector)
         {
             this.context = context;
             this.connector = connector;

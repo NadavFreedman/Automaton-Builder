@@ -1,4 +1,5 @@
 ﻿using AutomatonBuilder.Entities;
+using AutomatonBuilder.Interfaces;
 using AutomatonBuilder.Utils;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ namespace AutomatonBuilder.Actions.NodeActions
         private readonly ModelNode destination;
         private readonly string text;
         private readonly MainWindow host;
-        private UIElement connector;
+        private IConnector connector;
 
         public ConnectNodesAction(AutomatonContext context, ModelNode source, ModelNode destination, string text, MainWindow host)
         {

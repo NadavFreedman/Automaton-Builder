@@ -48,6 +48,7 @@ namespace AutomatonBuilder.Entities
 
         public Canvas MainCanvas;
 
+        public UIElement? HoveredElement { get; set; }
 
 
         public AutomatonContext(Canvas windowCanvas)
@@ -60,7 +61,9 @@ namespace AutomatonBuilder.Entities
             this.LastRightClickPosition = new Point();
             this.IsLeftMouseKeyPressed = false;
             this.StartingNode = null;
+            this.HoveredElement = null;
             this.MainCanvas = windowCanvas;
         }
+
     }
 }

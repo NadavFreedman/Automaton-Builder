@@ -42,6 +42,9 @@ namespace AutomatonBuilder.Entities.Actions
             removeTextItem.Click += this.host.RemoveText_Click;
             border.ContextMenu.Items.Add(removeTextItem);
 
+            ((TextBlock)border.Child).MouseLeave += host.Element_MouseLeave;
+            ((TextBlock)border.Child).MouseEnter += host.Element_MouseEnter;
+
             //Set the block to the canvas
             Canvas.SetLeft(border, context.LastRightClickPosition.X - 2 - formattedText.Width / 2);
             Canvas.SetTop(border, context.LastRightClickPosition.Y - 2 - formattedText.Height / 2);

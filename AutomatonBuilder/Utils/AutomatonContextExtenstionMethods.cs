@@ -1,13 +1,7 @@
 ﻿using AutomatonBuilder.Entities;
-using Petzold.Media2D;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using AutomatonBuilder.Interfaces;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace AutomatonBuilder.Utils
@@ -56,12 +50,15 @@ namespace AutomatonBuilder.Utils
             //Create the new node
             ModelNode node = new(context.NodesList.Count, host, context.LastRightClickPosition);
 
+            node.MouseEnter += host.Element_MouseEnter;
+            node.MouseLeave += host.Element_MouseLeave;
+
             //Auto-set the node to the starting node if it's the only one
             if (context.NodesList.Count == 0)
                 node.Starting = true;
             //Add the node to the Canvas
-            Canvas.SetLeft(node, context.LastRightClickPosition.X - node.Size / 2);
-            Canvas.SetTop(node, context.LastRightClickPosition.Y - node.Size / 2);
+
+            node.SetPosition(context.LastRightClickPosition);
 
             context.AddNode(node, host);
 
@@ -72,7 +69,7 @@ namespace AutomatonBuilder.Utils
         {
             nodeToAdd.Index = context.NodesList.Count;
             //Add each line connected to the node.
-            foreach (object connector in nodeToAdd.connectedLines)
+            foreach (object connector in nodeToAdd.connectedLinesToThisNode)
             {
                 context.MainCanvas.Children.Insert(0, (UIElement)connector);
                 context.MainCanvas.Children.Add((UIElement)((Shape)connector).Tag);
@@ -100,12 +97,19 @@ namespace AutomatonBuilder.Utils
                     node.Index--;
             }
 
+
             //Remove each line connected to the node.
-            foreach (object connector in nodeToRemove.connectedLines)
+            foreach (IConnector connector in nodeToRemove.connectedLinesFromThisNode)
             {
-                context.MainCanvas.Children.Remove((UIElement)connector);
-                context.MainCanvas.Children.Remove((UIElement)((Shape)connector).Tag);
+                connector.RemoveFromCanvas(context.MainCanvas);
             }
+
+            foreach (IConnector connector in nodeToRemove.connectedLinesToThisNode)
+            {
+                connector.RemoveFromCanvas(context.MainCanvas);
+            }
+
+            
 
             //if the node was the starting node, set it to null and remove the arrow from the screen.
             if (nodeToRemove.Starting)
