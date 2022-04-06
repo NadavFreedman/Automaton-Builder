@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutomatonBuilder.Interfaces;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Shapes;
@@ -37,6 +38,15 @@ namespace AutomatonBuilder.Entities
         public bool IsLeftMouseKeyPressed;
 
         /// <summary>
+        /// A flag indicating whether the left mouse button is currently pressed.
+        /// </summary>
+        public bool WasLeftMouseKeyPressedLastTick;
+
+        public Point LeftClickHoldStartingPosition;
+
+        public Point LeftClickHoldReleasePosition;
+
+        /// <summary>
         /// The position in which the right click was pressed last time
         /// </summary>
         public Point LastRightClickPosition;
@@ -48,7 +58,7 @@ namespace AutomatonBuilder.Entities
 
         public Canvas MainCanvas;
 
-        public UIElement? HoveredElement { get; set; }
+        public object? HoveredElement { get; set; }
 
 
         public AutomatonContext(Canvas windowCanvas)

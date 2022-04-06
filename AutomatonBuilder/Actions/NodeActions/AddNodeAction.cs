@@ -1,4 +1,5 @@
 ﻿using AutomatonBuilder.Entities;
+using AutomatonBuilder.Interfaces;
 using AutomatonBuilder.Utils;
 using System;
 using System.Collections.Generic;
@@ -23,17 +24,17 @@ namespace AutomatonBuilder.Actions.NodeActions
 
         public void DoAction()
         {
-            this.createdNode = this.context.CreateAndAddNode(this.host);
+            this.createdNode = NodeUtils.CreateAndAddNode(this.context, this.host);
         }
 
         public void RedoAction()
         {
-            this.context.AddNode(this.createdNode!, this.host);
+            NodeUtils.AddNode(this.context, this.createdNode!, this.host);
         }
 
         public void UndoAction()
         {
-            this.context.RemoveNode(this.createdNode!, this.host);
+            NodeUtils.RemoveNode(this.context, this.createdNode!, this.host);
         }
     }
 }

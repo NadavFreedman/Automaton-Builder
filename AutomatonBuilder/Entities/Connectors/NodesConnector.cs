@@ -10,11 +10,20 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace AutomatonBuilder.Entities
+namespace AutomatonBuilder.Entities.Connectors
 {
     public class NodesConnector: IConnector
     {
         public string ConnectorData { get; private set; }
+        public Point ConnectorMiddlePoint 
+        { 
+            get { return this.arrow.Points[1]; } 
+            set 
+            {
+                this.arrow.Points[1] = value;
+                this.SetTextPosition();
+            } 
+        }
 
         const int NODE_SIZE = 80;
 
@@ -94,10 +103,13 @@ namespace AutomatonBuilder.Entities
 
         public void BindConnectorToMainWindow(MainWindow mainWindow)
         {
-            this.arrow.MouseEnter += mainWindow.Element_MouseEnter;
-            this.borderedText.MouseEnter += mainWindow.Element_MouseEnter;
+            this.arrow.Tag = this;
+            this.borderedText.Tag = this;
+
+            this.arrow.MouseEnter += mainWindow.Connector_MouseEnter;
+            this.borderedText.MouseEnter += mainWindow.Element_MouseLeave;
             this.borderedText.MouseLeave += mainWindow.Element_MouseLeave;
-            this.arrow.MouseLeave += mainWindow.Element_MouseLeave;
+            this.arrow.MouseLeave += mainWindow.Connector_MouseEnter;
 
             ConnectorUtils.AddContextMenuToConnectorElement(this.arrow, mainWindow, this);
             ConnectorUtils.AddContextMenuToConnectorElement(this.borderedText, mainWindow, this);
@@ -126,7 +138,7 @@ namespace AutomatonBuilder.Entities
                 };
 
             }
-            TextUtils.SetPositionForText(this.borderedText, this.formmattedText, middlePoint);
+            TextUtils.SetPositionForText(this.borderedText, middlePoint, this.formmattedText);
         }
 
         public void SetConnectorStart(Point newStartingPoint)

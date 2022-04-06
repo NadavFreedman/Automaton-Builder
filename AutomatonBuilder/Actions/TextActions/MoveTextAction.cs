@@ -1,27 +1,36 @@
 ﻿using AutomatonBuilder.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using AutomatonBuilder.Utils;
+using System.Windows;
+using AutomatonBuilder.Interfaces;
+using System.Windows.Controls;
 
 namespace AutomatonBuilder.Actions.TextActions
 {
     public class MoveTextAction : IAction
     {
+        private Point startingPoint;
+        private Point endPoint;
+        private Border borderedText;
+
+        public MoveTextAction(Border movedBorderedText, Point startingPoint, Point endPoint)
+        {
+            this.borderedText = movedBorderedText;
+            this.startingPoint = startingPoint;
+            this.endPoint = endPoint;
+        }
         public void DoAction()
         {
-            throw new NotImplementedException();
+            return;
         }
 
         public void RedoAction()
         {
-            throw new NotImplementedException();
+            TextUtils.SetPositionForText(borderedText, endPoint);
         }
 
         public void UndoAction()
         {
-            throw new NotImplementedException();
+            TextUtils.SetPositionForText(borderedText, startingPoint);
         }
     }
 }

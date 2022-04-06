@@ -125,7 +125,7 @@ namespace AutomatonBuilder.Entities
 
         private void StartingMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            this.root.context.ToggleNodeStarting(this);
+            NodeUtils.ToggleNodeStarting(this.root.context, this);
         }
     }
 }

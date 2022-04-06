@@ -1,22 +1,16 @@
-﻿using AutomatonBuilder.Utils;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using AutomatonBuilder.Entities;
+using AutomatonBuilder.Utils;
+using AutomatonBuilder.Interfaces;
 using System.Windows.Controls;
-using System.Windows.Media;
 
-namespace AutomatonBuilder.Entities.Actions
+namespace AutomatonBuilder.Actions.TextActions
 {
     public class AddTextAction : IAction
     {
         private readonly AutomatonContext context;
         private readonly string text;
         private readonly MainWindow host;
-        private Border? textBox;
+        private Border? borderedText;
 
         public AddTextAction(AutomatonContext context, string text, MainWindow host)
         {
@@ -27,40 +21,38 @@ namespace AutomatonBuilder.Entities.Actions
         public void DoAction()
         {
             //Create a text block
-            Border border = TextUtils.CreateBorderWithTextBlock(this.text);
+            Border borderedText = TextUtils.CreateBorderWithTextBlock(this.text);
 
             //Calculate the size of the text block
-            var formattedText = TextUtils.CreateFormattedText((TextBlock)border.Child);
+            
 
             //Add a context menu to the text block
-            border.ContextMenu = new ContextMenu();
+            borderedText.ContextMenu = new ContextMenu();
             MenuItem removeTextItem = new MenuItem
             {
                 Header = "Remove",
-                Tag = border
+                Tag = borderedText
             };
             removeTextItem.Click += this.host.RemoveText_Click;
-            border.ContextMenu.Items.Add(removeTextItem);
+            borderedText.ContextMenu.Items.Add(removeTextItem);
 
-            ((TextBlock)border.Child).MouseLeave += host.Element_MouseLeave;
-            ((TextBlock)border.Child).MouseEnter += host.Element_MouseEnter;
+            ((TextBlock)borderedText.Child).MouseLeave += host.Element_MouseLeave;
+            ((TextBlock)borderedText.Child).MouseEnter += host.GeneralElement_MouseEnter;
 
-            //Set the block to the canvas
-            Canvas.SetLeft(border, context.LastRightClickPosition.X - 2 - formattedText.Width / 2);
-            Canvas.SetTop(border, context.LastRightClickPosition.Y - 2 - formattedText.Height / 2);
+            TextUtils.SetPositionForText(borderedText, context.LastRightClickPosition);
 
-            this.textBox = border;
-            context.MainCanvas.Children.Add(border);
+            this.borderedText = borderedText;
+            context.MainCanvas.Children.Add(borderedText);
         }
 
         public void RedoAction()
         {
-            TextUtils.AddTextBoxToCanvas(this.textBox!, this.context.MainCanvas);
+            TextUtils.AddBorderedElementToCanvas(this.borderedText!, this.context.MainCanvas);
         }
 
         public void UndoAction()
         {
-            TextUtils.RemoveTextBoxFromCanvas(this.textBox!, this.context.MainCanvas);
+            TextUtils.RemoveBorderedElementFromCanvas(this.borderedText!, this.context.MainCanvas);
 
         }
     }

@@ -1,12 +1,14 @@
 ﻿using AutomatonBuilder.Actions;
 using AutomatonBuilder.Actions.NodeActions;
+using AutomatonBuilder.Actions.TextActions;
 using AutomatonBuilder.Entities;
 using AutomatonBuilder.Entities.Actions;
-using AutomatonBuilder.Entities.Actions.TextActions;
+using AutomatonBuilder.Entities.Connectors;
 using AutomatonBuilder.Interfaces;
 using AutomatonBuilder.Modals;
 using AutomatonBuilder.Utils;
 using Microsoft.Win32;
+using AutomatonBuilder.Interfaces;
 using Petzold.Media2D;
 using System;
 using System.Collections.Generic;
@@ -126,11 +128,14 @@ namespace AutomatonBuilder
         /// <param name="e">Event Arguments</param>
         private void MyCanvas_MouseMove(object sender, MouseEventArgs e)
         {
+            this.context.WasLeftMouseKeyPressedLastTick = this.context.IsLeftMouseKeyPressed;
+            this.context.IsLeftMouseKeyPressed = e.LeftButton == MouseButtonState.Pressed;
             //If the left mouse button is pressed
-            if (e.LeftButton == MouseButtonState.Pressed)
+            Title = $"{this.context.HoveredElement}";
+            if (this.context.IsLeftMouseKeyPressed)
             {
-                //Turn on the mouse flag.
-                this.context.IsLeftMouseKeyPressed = true;
+                if (!this.context.WasLeftMouseKeyPressedLastTick)
+                    this.context.LeftClickHoldStartingPosition = e.GetPosition(this);
 
                 if (this.context.HoveredElement == null)
                 {
@@ -166,36 +171,68 @@ namespace AutomatonBuilder
                     {
                         node.SetPosition(e.GetPosition(this));
                     }
+                    else if (this.context.HoveredElement is NodesConnector connector)
+                    {
+                        connector.ConnectorMiddlePoint = e.GetPosition(this);
+                    }
+                    else if (this.context.HoveredElement is TextBlock block)
+                    {
+                        Border borderedText = (Border)block.Tag;
+                        TextUtils.SetPositionForText(borderedText, e.GetPosition(this));
+                    }
+
                 }
                 
             }
             else
             {
-                //Turn off the mouse flag.
-                this.context.IsLeftMouseKeyPressed = false;
-
-                //If there was a line currently drawn, save to the Undo stack and create a new, empty line.
-                if (this.context.CurrentLine.Count != 0)
+                if (this.context.WasLeftMouseKeyPressedLastTick)
                 {
-                    IAction drawingAction = new DrawLineAction(context);
-                    context.CurrentLine = new List<Ellipse>();
-                    DoAction(drawingAction);
+                    this.context.LeftClickHoldReleasePosition = e.GetPosition(this);
 
+                    //If there was a line currently drawn, save to the Undo stack and create a new, empty line.
+                    if (this.context.CurrentLine.Count != 0)
+                    {
+                        IAction drawingAction = new DrawLineAction(context);
+                        context.CurrentLine = new List<Ellipse>();
+                        DoAction(drawingAction);
+                    }
+
+                    else if (this.context.HoveredElement is TextBlock block)
+                    {
+                        Border borderedText = (Border)block.Tag;
+                        IAction moveTextAction = new MoveTextAction(borderedText, this.context.LeftClickHoldStartingPosition, this.context.LeftClickHoldReleasePosition);
+                        DoAction(moveTextAction);
+                    }
+                    else if (this.context.HoveredElement is ModelNode node)
+                    {
+                        IAction moveNodeAction = new MoveNodeAction(node, this.context.LeftClickHoldStartingPosition, this.context.LeftClickHoldReleasePosition);
+                        DoAction(moveNodeAction);
+                    }
+                    else if (this.context.HoveredElement is NodesConnector connector)
+                    {
+                        IAction moveConnectorAction = new MoveConnectorAction(connector, this.context.LeftClickHoldStartingPosition, this.context.LeftClickHoldReleasePosition);
+                        DoAction(moveConnectorAction);
+                    }
                 }
             }
         }
 
-        public void Element_MouseEnter(object sender, MouseEventArgs e)
+        public void GeneralElement_MouseEnter(object sender, MouseEventArgs e)
         {
             UIElement hovered = (UIElement)sender;
             this.context.HoveredElement = hovered;
-            Title = $"{this.context.HoveredElement}";
         }
 
         public void Element_MouseLeave(object sender, MouseEventArgs e)
         {
-            this.context.HoveredElement = null;
-            Title = $"{this.context.HoveredElement}";
+            if (!this.context.WasLeftMouseKeyPressedLastTick && !this.context.IsLeftMouseKeyPressed)
+                this.context.HoveredElement = null;
+        }
+
+        public void Connector_MouseEnter(object sender, MouseEventArgs e)
+        {
+            this.context.HoveredElement = (IConnector)((FrameworkElement)sender).Tag;
         }
 
 

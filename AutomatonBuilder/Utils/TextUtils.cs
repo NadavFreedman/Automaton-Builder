@@ -30,6 +30,8 @@ namespace AutomatonBuilder.Utils
                 Child = lineTextBlock
             };
 
+            lineTextBlock.Tag = border;
+
             return border;
         }
         public static FormattedText CreateFormattedText(TextBlock block)
@@ -45,17 +47,19 @@ namespace AutomatonBuilder.Utils
                                      1);
         }
 
-        public static void SetPositionForText(Border text, FormattedText formattedText, Point textCoords)
+        public static void SetPositionForText(Border borderedText, Point textCoords, FormattedText? formattedText = null)
         {
-            Canvas.SetLeft(text, textCoords.X - 2 - formattedText.Width / 2);
-            Canvas.SetTop(text, textCoords.Y - 2 - formattedText.Height / 2);
+            if (formattedText == null)
+                formattedText = TextUtils.CreateFormattedText((TextBlock)borderedText.Child);
+            Canvas.SetLeft(borderedText, textCoords.X - 2 - formattedText.Width / 2);
+            Canvas.SetTop(borderedText, textCoords.Y - 2 - formattedText.Height / 2);
         }
 
-        public static void RemoveTextBoxFromCanvas(Border box, Canvas mainCanvas)
+        public static void RemoveBorderedElementFromCanvas(Border box, Canvas mainCanvas)
         {
             mainCanvas.Children.Remove(box);
         }
-        public static void AddTextBoxToCanvas(Border box, Canvas mainCanvas)
+        public static void AddBorderedElementToCanvas(Border box, Canvas mainCanvas)
         {
             mainCanvas.Children.Add(box);
         }

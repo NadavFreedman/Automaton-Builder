@@ -58,7 +58,7 @@ namespace AutomatonBuilder.Entities.Connectors
         public void SetTextPosition()
         {
             Point textCoords = new(this.nodeCenter.X - 80 / 2, this.nodeCenter.Y - 80 / 2);
-            TextUtils.SetPositionForText(this.borderedText, this.formmattedText, textCoords);
+            TextUtils.SetPositionForText(this.borderedText, textCoords, this.formmattedText);
         }
 
         public void SetConnectorPosition()
@@ -70,11 +70,6 @@ namespace AutomatonBuilder.Entities.Connectors
 
         public void BindConnectorToMainWindow(MainWindow mainWindow)
         {
-            this.ellipse.MouseEnter += mainWindow.Element_MouseEnter;
-            this.borderedText.MouseEnter += mainWindow.Element_MouseEnter;
-            this.borderedText.MouseLeave += mainWindow.Element_MouseLeave;
-            this.ellipse.MouseLeave += mainWindow.Element_MouseLeave;
-
             ConnectorUtils.AddContextMenuToConnectorElement(this.ellipse, mainWindow, this);
             ConnectorUtils.AddContextMenuToConnectorElement(this.borderedText, mainWindow, this);
         }
@@ -89,12 +84,14 @@ namespace AutomatonBuilder.Entities.Connectors
         {
             this.nodeCenter = startingPoint;
             this.SetConnectorPosition();
+            this.SetTextPosition();
         }
 
         public void SetConnectorEnd(Point endPoint)
         {
             this.nodeCenter = endPoint;
             this.SetConnectorPosition();
+            this.SetTextPosition();
         }
     }
 }

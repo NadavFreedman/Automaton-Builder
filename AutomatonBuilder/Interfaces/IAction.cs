@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AutomatonBuilder.Entities
+namespace AutomatonBuilder.Interfaces
 {
     public interface IAction
     {

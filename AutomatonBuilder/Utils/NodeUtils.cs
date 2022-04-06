@@ -1,12 +1,10 @@
 ﻿using AutomatonBuilder.Entities;
 using AutomatonBuilder.Interfaces;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Shapes;
 
 namespace AutomatonBuilder.Utils
 {
-    public static class AutomatonContextExtenstionMethods
+    public static class NodeUtils
     {
         #region StartingNodeActions
         private static void SetStartingNodeToNull(AutomatonContext context)
@@ -22,13 +20,13 @@ namespace AutomatonBuilder.Utils
 
             //if there was a starting node, toggle it.
             if (context.StartingNode != null)
-                context.ToggleNodeStarting(context.StartingNode);
+                NodeUtils.ToggleNodeStarting(context, context.StartingNode);
 
             //Set this node to be the starting node
             context.StartingNode = node;
         }
 
-        public static void ToggleNodeStarting(this AutomatonContext context, ModelNode node)
+        public static void ToggleNodeStarting(AutomatonContext context, ModelNode node)
         {
             //Toggle the starting flag.
             node.Starting = !node.Starting;
@@ -45,12 +43,12 @@ namespace AutomatonBuilder.Utils
         #endregion
 
         #region CreateAddRemoveNodeActions
-        public static ModelNode CreateAndAddNode(this AutomatonContext context, MainWindow host)
+        public static ModelNode CreateAndAddNode(AutomatonContext context, MainWindow host)
         {
             //Create the new node
             ModelNode node = new(context.NodesList.Count, host, context.LastRightClickPosition);
 
-            node.MouseEnter += host.Element_MouseEnter;
+            node.MouseEnter += host.GeneralElement_MouseEnter;
             node.MouseLeave += host.Element_MouseLeave;
 
             //Auto-set the node to the starting node if it's the only one
@@ -60,19 +58,23 @@ namespace AutomatonBuilder.Utils
 
             node.SetPosition(context.LastRightClickPosition);
 
-            context.AddNode(node, host);
+            NodeUtils.AddNode(context, node, host);
 
             return node;
         }
 
-        public static void AddNode(this AutomatonContext context, ModelNode nodeToAdd ,MainWindow host)
+        public static void AddNode(AutomatonContext context, ModelNode nodeToAdd ,MainWindow host)
         {
             nodeToAdd.Index = context.NodesList.Count;
+
             //Add each line connected to the node.
-            foreach (object connector in nodeToAdd.connectedLinesToThisNode)
+            foreach (IConnector connector in nodeToAdd.connectedLinesToThisNode)
             {
-                context.MainCanvas.Children.Insert(0, (UIElement)connector);
-                context.MainCanvas.Children.Add((UIElement)((Shape)connector).Tag);
+                connector.AddToCanvasButtom(context.MainCanvas);
+            }
+            foreach (IConnector connector in nodeToAdd.connectedLinesFromThisNode)
+            {
+                connector.AddToCanvasButtom(context.MainCanvas);
             }
 
             //if the node was the starting node, set it to null and remove the arrow from the screen.
@@ -85,10 +87,10 @@ namespace AutomatonBuilder.Utils
             context.NodesList.Add(nodeToAdd);
 
             //Add the node to each of the context menus of the existing nodes
-            context.SetNodesContextMenuOptions(host);
+            NodeUtils.SetNodesContextMenuOptions(context, host);
         }
 
-        public static void RemoveNode(this AutomatonContext context, ModelNode nodeToRemove, MainWindow host)
+        public static void RemoveNode(AutomatonContext context, ModelNode nodeToRemove, MainWindow host)
         {
             //Decrease the index of each node that was created after the current node.
             foreach (ModelNode node in context.NodesList)
@@ -122,12 +124,12 @@ namespace AutomatonBuilder.Utils
             context.NodesList.Remove(nodeToRemove);
 
             //Remove the node from the context menu of each existing node.
-            context.SetNodesContextMenuOptions(host);
+            NodeUtils.SetNodesContextMenuOptions(context, host);
         }
         #endregion
 
         #region Misc
-        public static void SetNodesContextMenuOptions(this AutomatonContext context, MainWindow host)
+        public static void SetNodesContextMenuOptions(AutomatonContext context, MainWindow host)
         {
             foreach (ModelNode changedNode in context.NodesList)
             {
