@@ -21,7 +21,7 @@ namespace AutomatonBuilder.Entities
     /// <summary>
     /// Interaction logic for ModelNode.xaml
     /// </summary>
-    public partial class ModelNode : UserControl
+    public partial class ModelNode : UserControl, IMoveable
     {
         public int Size { get; set; }
 

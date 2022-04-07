@@ -1,5 +1,6 @@
 ﻿using AutomatonBuilder.Entities;
 using AutomatonBuilder.Entities.Connectors;
+using AutomatonBuilder.Entities.TextElements;
 using AutomatonBuilder.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -62,7 +63,7 @@ namespace AutomatonBuilder.Utils
             return connector;
         }
 
-        public static void AddContextMenuToConnectorElement(FrameworkElement connectorElement, MainWindow host, IConnector connector)
+        public static void AddContextMenuToConnectorLine(FrameworkElement connectorElement, MainWindow host, IConnector connector)
         {
             MenuItem removeConnector = new MenuItem
             {
@@ -74,12 +75,45 @@ namespace AutomatonBuilder.Utils
             connectorElement.ContextMenu.Items.Add(removeConnector);
         }
 
+        public static void AddContextMenuToConnectorText(BorderedText borderedText, MainWindow host, IConnector connector)
+        {
+            MenuItem removeConnector = new MenuItem
+            {
+                Header = "Remove",
+                Tag = connector
+            };
+            removeConnector.Click += host.RemoveConnector_Click;
+            var menu = new ContextMenu();
+            menu.Items.Add(removeConnector);
+            borderedText.AttachContextMenu(menu);
+        }
+
 
         public static void ReconnectConnector(AutomatonContext context, IConnector connector, ModelNode source, ModelNode? destination = null)
         {
             source.connectedLinesFromThisNode.Add(connector);
             destination?.connectedLinesToThisNode.Add(connector);
             connector.AddToCanvasButtom(context.MainCanvas);
+        }
+
+        public static ModelNode? GetNodeByName(AutomatonContext context, string nodeName)
+        {
+            foreach (ModelNode node in context.NodesList)
+            {
+                if (node.ToString() == nodeName)
+                    return node;
+            }
+            return null;   
+        }
+
+        public static double GetAlpha(Point a, Point b)
+        {
+            double deltaX = a.X - b.X;
+            double deltaY = a.Y - b.Y;
+            double alpha = Math.Atan(deltaY / deltaX);
+            if (deltaX < 0 && deltaY < 0 || deltaY > 0 && deltaX < 0)
+                return alpha - Math.PI;
+            return alpha;
         }
 
     }

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using AutomatonBuilder.Entities.TextElements;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -30,7 +26,7 @@ namespace AutomatonBuilder.Utils
                 Child = lineTextBlock
             };
 
-            lineTextBlock.Tag = border;
+            border.Tag = lineTextBlock;
 
             return border;
         }
@@ -47,21 +43,17 @@ namespace AutomatonBuilder.Utils
                                      1);
         }
 
-        public static void SetPositionForText(Border borderedText, Point textCoords, FormattedText? formattedText = null)
+        public static void AddContextMenuToText(BorderedText borderedText, MainWindow host)
         {
-            if (formattedText == null)
-                formattedText = TextUtils.CreateFormattedText((TextBlock)borderedText.Child);
-            Canvas.SetLeft(borderedText, textCoords.X - 2 - formattedText.Width / 2);
-            Canvas.SetTop(borderedText, textCoords.Y - 2 - formattedText.Height / 2);
-        }
-
-        public static void RemoveBorderedElementFromCanvas(Border box, Canvas mainCanvas)
-        {
-            mainCanvas.Children.Remove(box);
-        }
-        public static void AddBorderedElementToCanvas(Border box, Canvas mainCanvas)
-        {
-            mainCanvas.Children.Add(box);
+            MenuItem removeConnector = new MenuItem
+            {
+                Header = "Remove",
+                Tag = borderedText
+            };
+            removeConnector.Click += host.RemoveText_Click;
+            var menu = new ContextMenu();
+            menu.Items.Add(removeConnector);
+            borderedText.AttachContextMenu(menu);
         }
     }
 }

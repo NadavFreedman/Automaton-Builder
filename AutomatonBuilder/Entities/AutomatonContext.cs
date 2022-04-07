@@ -7,58 +7,36 @@ using AutomatonBuilder.Interfaces;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Shapes;
+using Petzold.Media2D;
+using System.Windows.Media;
 
 namespace AutomatonBuilder.Entities
 {
     public class AutomatonContext
     {
-        /// <summary>
-        /// A list containing all of the nodes currently on the screen
-        /// </summary>
         public readonly List<ModelNode> NodesList;
 
-        /// <summary>
-        /// A stack storing the lines that can be undone
-        /// </summary>
         public readonly Stack<IAction> DoneActionsStack;
 
-        /// <summary>
-        /// A stack storing the lines that can be redone
-        /// </summary>
         public readonly Stack<IAction> UndoneActionsStack;
 
-        /// <summary>
-        /// A list containing the ellipses that are part of the current line drawn
-        /// </summary>
-        public List<Ellipse>? CurrentLine;
+        public Polyline CurrentLine;
 
-        /// <summary>
-        /// A flag indicating whether the left mouse button is currently pressed.
-        /// </summary>
         public bool IsLeftMouseKeyPressed;
 
-        /// <summary>
-        /// A flag indicating whether the left mouse button is currently pressed.
-        /// </summary>
         public bool WasLeftMouseKeyPressedLastTick;
 
         public Point LeftClickHoldStartingPosition;
 
         public Point LeftClickHoldReleasePosition;
 
-        /// <summary>
-        /// The position in which the right click was pressed last time
-        /// </summary>
         public Point LastRightClickPosition;
 
-        /// <summary>
-        /// The starting node
-        /// </summary>
         public ModelNode? StartingNode;
 
         public Canvas MainCanvas;
 
-        public object? HoveredElement { get; set; }
+        public IMoveable? HoveredElement { get; set; }
 
 
         public AutomatonContext(Canvas windowCanvas)
@@ -67,12 +45,18 @@ namespace AutomatonBuilder.Entities
             this.NodesList = new List<ModelNode>();
             this.UndoneActionsStack = new Stack<IAction>();
             this.DoneActionsStack = new Stack<IAction>();
-            this.CurrentLine = new List<Ellipse>();
+            this.CurrentLine = new Polyline
+            {
+                Stroke = Brushes.Black,
+                StrokeThickness = 2.5,
+                Points = new PointCollection()
+            };
+            this.MainCanvas = windowCanvas;
+            this.MainCanvas.Children.Add(this.CurrentLine);
             this.LastRightClickPosition = new Point();
             this.IsLeftMouseKeyPressed = false;
             this.StartingNode = null;
             this.HoveredElement = null;
-            this.MainCanvas = windowCanvas;
         }
 
     }

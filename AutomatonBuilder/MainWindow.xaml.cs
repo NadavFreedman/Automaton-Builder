@@ -1,32 +1,22 @@
-﻿using AutomatonBuilder.Actions;
-using AutomatonBuilder.Actions.NodeActions;
+﻿using AutomatonBuilder.Actions.NodeActions;
 using AutomatonBuilder.Actions.TextActions;
 using AutomatonBuilder.Entities;
-using AutomatonBuilder.Entities.Actions;
-using AutomatonBuilder.Entities.Connectors;
 using AutomatonBuilder.Interfaces;
 using AutomatonBuilder.Modals;
-using AutomatonBuilder.Utils;
 using Microsoft.Win32;
-using AutomatonBuilder.Interfaces;
-using Petzold.Media2D;
 using System;
-using System.Collections.Generic;
 using System.Drawing.Imaging;
-using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
+using AutomatonBuilder.Entities.TextElements;
+using AutomatonBuilder.Actions.MovementActions;
+using AutomatonBuilder.Actions.DrawingActions;
+using AutomatonBuilder.Utils;
 
 namespace AutomatonBuilder
 {
@@ -74,19 +64,10 @@ namespace AutomatonBuilder
         /// <param name="e">Event Arguments</param>
         public void ConnectNodes(object sender, RoutedEventArgs e)
         {
-            string connectToName = ((MenuItem)sender).Header.ToString();
-            ModelNode connectTo = null;
-
             //Get the node that is associated to the MenuItem
             ModelNode connectFrom = (ModelNode)((MenuItem)sender).Tag;
+            ModelNode connectTo = ConnectorUtils.GetNodeByName(this.context, ((MenuItem)sender).Header.ToString());
 
-            //Get the destination node.
-            foreach (ModelNode node in this.context.NodesList)
-                if (node.ToString() == connectToName)
-                {
-                    connectTo = node;
-                    break;
-                }
 
             //Get the Text to be written on the arrow
             ConnectorInput connectorInputWindow = new ConnectorInput(connectFrom.ToString(), connectTo.ToString());
@@ -115,8 +96,8 @@ namespace AutomatonBuilder
 
         public void RemoveText_Click(object sender, RoutedEventArgs e)
         {
-            Border box = (Border)((MenuItem)sender).Tag;
-            IAction removeText = new RemoveTextAction(this.context, box);
+            BorderedText text = (BorderedText)((MenuItem)sender).Tag;
+            IAction removeText = new RemoveTextAction(this.context, text);
             DoAction(removeText);
 
         }
@@ -130,57 +111,34 @@ namespace AutomatonBuilder
         {
             this.context.WasLeftMouseKeyPressedLastTick = this.context.IsLeftMouseKeyPressed;
             this.context.IsLeftMouseKeyPressed = e.LeftButton == MouseButtonState.Pressed;
-            //If the left mouse button is pressed
-            Title = $"{this.context.HoveredElement}";
-            if (this.context.IsLeftMouseKeyPressed)
+
+            if (Keyboard.IsKeyDown(Key.LeftShift)) { }
+            else if (this.context.IsLeftMouseKeyPressed)
             {
                 if (!this.context.WasLeftMouseKeyPressedLastTick)
                     this.context.LeftClickHoldStartingPosition = e.GetPosition(this);
 
-                if (this.context.HoveredElement == null)
+                if (Keyboard.IsKeyDown(Key.LeftCtrl))
                 {
-                    //Create the ellipse
-                    Ellipse ellipse = new Ellipse()
+                    if (this.context.CurrentLine.Points.Count != 0)
                     {
-                        Fill = Brushes.Black,
-                        Width = 6,
-                        Height = 6,
-                    };
-
-                    //Set the coordinates of the ellipse.
-                    Canvas.SetLeft(ellipse, e.GetPosition(this).X - 3);
-                    Canvas.SetTop(ellipse, e.GetPosition(this).Y - 3);
-
-                    //If Ctrl is held then it's removal
-                    if (Keyboard.IsKeyDown(Key.LeftCtrl))
-                    {
-                        ellipse.Fill = Brushes.White;
-                        ellipse.Width = 20;
-                        ellipse.Height = 20;
-                        Canvas.SetLeft(ellipse, e.GetPosition(this).X - 10);
-                        Canvas.SetTop(ellipse, e.GetPosition(this).Y - 10);
+                        IAction drawingAction = new DrawLineAction(this.context);
+                        DoAction(drawingAction);
                     }
 
-                    //Add the ellipse to the currently drawn line and print it to the screen.
-                    this.context.CurrentLine.Add(ellipse);
-                    MainCanvas.Children.Add(ellipse);
+                    if (Mouse.DirectlyOver is Polyline line)
+                    {
+                        IAction deleteLineAction = new DeleteLineAction(this.context, line);
+                        DoAction(deleteLineAction);
+                    }
+                }
+                else if (this.context.HoveredElement is null)
+                {
+                    this.context.CurrentLine.Points.Add(e.GetPosition(this));
                 }
                 else
                 {
-                    if (this.context.HoveredElement is ModelNode node)
-                    {
-                        node.SetPosition(e.GetPosition(this));
-                    }
-                    else if (this.context.HoveredElement is NodesConnector connector)
-                    {
-                        connector.ConnectorMiddlePoint = e.GetPosition(this);
-                    }
-                    else if (this.context.HoveredElement is TextBlock block)
-                    {
-                        Border borderedText = (Border)block.Tag;
-                        TextUtils.SetPositionForText(borderedText, e.GetPosition(this));
-                    }
-
+                    this.context.HoveredElement.SetPosition(e.GetPosition(this));
                 }
                 
             }
@@ -190,49 +148,36 @@ namespace AutomatonBuilder
                 {
                     this.context.LeftClickHoldReleasePosition = e.GetPosition(this);
 
-                    //If there was a line currently drawn, save to the Undo stack and create a new, empty line.
-                    if (this.context.CurrentLine.Count != 0)
+                    if (this.context.CurrentLine!.Points.Count != 0)
                     {
                         IAction drawingAction = new DrawLineAction(context);
-                        context.CurrentLine = new List<Ellipse>();
                         DoAction(drawingAction);
                     }
-
-                    else if (this.context.HoveredElement is TextBlock block)
+                    else if (this.context.HoveredElement is not null)
                     {
-                        Border borderedText = (Border)block.Tag;
-                        IAction moveTextAction = new MoveTextAction(borderedText, this.context.LeftClickHoldStartingPosition, this.context.LeftClickHoldReleasePosition);
+                        IAction moveTextAction = new MoveElementAction(this.context.HoveredElement, this.context.LeftClickHoldStartingPosition, this.context.LeftClickHoldReleasePosition);
                         DoAction(moveTextAction);
-                    }
-                    else if (this.context.HoveredElement is ModelNode node)
-                    {
-                        IAction moveNodeAction = new MoveNodeAction(node, this.context.LeftClickHoldStartingPosition, this.context.LeftClickHoldReleasePosition);
-                        DoAction(moveNodeAction);
-                    }
-                    else if (this.context.HoveredElement is NodesConnector connector)
-                    {
-                        IAction moveConnectorAction = new MoveConnectorAction(connector, this.context.LeftClickHoldStartingPosition, this.context.LeftClickHoldReleasePosition);
-                        DoAction(moveConnectorAction);
                     }
                 }
             }
+
         }
 
         public void GeneralElement_MouseEnter(object sender, MouseEventArgs e)
         {
-            UIElement hovered = (UIElement)sender;
+            IMoveable hovered = (IMoveable)sender;
             this.context.HoveredElement = hovered;
         }
 
         public void Element_MouseLeave(object sender, MouseEventArgs e)
         {
-            if (!this.context.WasLeftMouseKeyPressedLastTick && !this.context.IsLeftMouseKeyPressed)
+            if (!this.context.IsLeftMouseKeyPressed)
                 this.context.HoveredElement = null;
         }
 
-        public void Connector_MouseEnter(object sender, MouseEventArgs e)
+        public void TaggedElement_MouseEnter(object sender, MouseEventArgs e)
         {
-            this.context.HoveredElement = (IConnector)((FrameworkElement)sender).Tag;
+            this.context.HoveredElement = (IMoveable)((FrameworkElement)sender).Tag;
         }
 
 

@@ -5,12 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using AutomatonBuilder.Interfaces;
 using System.Windows.Shapes;
+using System.Windows.Media;
+using AutomatonBuilder.Entities;
 
-namespace AutomatonBuilder.Entities.Actions
+namespace AutomatonBuilder.Actions.DrawingActions
 {
     public class DrawLineAction : IAction
     {
-        private readonly List<Ellipse> drawnLine;
+        private readonly Polyline drawnLine;
         private readonly AutomatonContext context;
 
         public DrawLineAction(AutomatonContext context)
@@ -20,19 +22,23 @@ namespace AutomatonBuilder.Entities.Actions
         }
         public void DoAction()
         {
-            return;
+            this.context.CurrentLine = new Polyline
+            {
+                Stroke = Brushes.Black,
+                StrokeThickness = 2.5,
+                Points = new PointCollection()
+            };
+            this.context.MainCanvas.Children.Add(this.context.CurrentLine);
         }
 
         public void RedoAction()
         {
-            foreach (Ellipse dotToAdd in this.drawnLine)
-                context.MainCanvas.Children.Add(dotToAdd);
+            this.context.MainCanvas.Children.Add(this.drawnLine);
         }
 
         public void UndoAction()
         {
-            foreach (Ellipse dotToRemove in this.drawnLine)
-                context.MainCanvas.Children.Remove(dotToRemove);
+            this.context.MainCanvas.Children.Remove(this.drawnLine);
         }
     }
 }

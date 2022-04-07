@@ -1,4 +1,6 @@
-﻿using AutomatonBuilder.Interfaces;
+﻿using AutomatonBuilder.Entities.Enums;
+using AutomatonBuilder.Entities.TextElements;
+using AutomatonBuilder.Interfaces;
 using AutomatonBuilder.Utils;
 using System;
 using System.Collections.Generic;
@@ -18,8 +20,7 @@ namespace AutomatonBuilder.Entities.Connectors
 
         private Ellipse ellipse;
         private Point nodeCenter;
-        private Border borderedText;
-        private FormattedText formmattedText;
+        private BorderedText text;
 
         public SelfConnector(string text, Point nodeCenter)
         {
@@ -38,27 +39,25 @@ namespace AutomatonBuilder.Entities.Connectors
 
         private void InitBorder(string text)
         {
-            this.borderedText = TextUtils.CreateBorderWithTextBlock(text);
+            this.text = new(text);
         }
 
         public void ChangeConnectorData(string text)
         {
             this.ConnectorData = text;
-            TextBlock childText = (TextBlock)this.borderedText.Child;
-            this.formmattedText = TextUtils.CreateFormattedText(childText);
-            childText.Text = text;
+            this.text.SetText(text);
         }
 
         public void AddToCanvasButtom(Canvas canvas)
         {
-            canvas.Children.Insert(0, this.borderedText);
+            this.text.AddToCanvas(canvas, ZAxis.Bottom);
             canvas.Children.Insert(0, this.ellipse);
         }
 
         public void SetTextPosition()
         {
             Point textCoords = new(this.nodeCenter.X - 80 / 2, this.nodeCenter.Y - 80 / 2);
-            TextUtils.SetPositionForText(this.borderedText, textCoords, this.formmattedText);
+            this.text.SetPosition(textCoords);
         }
 
         public void SetConnectorPosition()
@@ -70,14 +69,14 @@ namespace AutomatonBuilder.Entities.Connectors
 
         public void BindConnectorToMainWindow(MainWindow mainWindow)
         {
-            ConnectorUtils.AddContextMenuToConnectorElement(this.ellipse, mainWindow, this);
-            ConnectorUtils.AddContextMenuToConnectorElement(this.borderedText, mainWindow, this);
+            ConnectorUtils.AddContextMenuToConnectorLine(this.ellipse, mainWindow, this);
+            ConnectorUtils.AddContextMenuToConnectorText(this.text, mainWindow, this);
         }
 
         public void RemoveFromCanvas(Canvas canvas)
         {
             canvas.Children.Remove(this.ellipse);
-            canvas.Children.Remove(this.borderedText);
+            this.text.RemoveFromCanvas(canvas);
         }
 
         public void SetConnectorStart(Point startingPoint)
