@@ -1,5 +1,6 @@
 ﻿using AutomatonBuilder.Interfaces;
 using AutomatonBuilder.Utils;
+using Newtonsoft.Json;
 using Petzold.Media2D;
 using System;
 using System.Collections.Generic;
@@ -29,11 +30,13 @@ namespace AutomatonBuilder.Entities
 
         public bool Starting;
 
+        [JsonIgnore]
         public ArrowLine startingArrow;
 
+        [JsonIgnore]
         private readonly MainWindow root;
 
-        public Point Position;
+        private Point position;
 
         public List<IConnector> connectedLinesToThisNode;
         public List<IConnector> connectedLinesFromThisNode;
@@ -49,9 +52,9 @@ namespace AutomatonBuilder.Entities
             this.root = host;
             this.accepting = false;
             this.Resize(70);
-            this.Position = new Point();
+            this.position = new Point();
             this.Starting = false;
-            this.Position = pos;
+            this.position = pos;
 
             this.startingArrow = new ArrowLine()
             {
@@ -89,14 +92,14 @@ namespace AutomatonBuilder.Entities
 
         public void SetPosition(Point newPosition)
         {
-            this.Position = newPosition;
+            this.position = newPosition;
             this.startingArrow.X1 = newPosition.X - 45;
             this.startingArrow.Y1 = newPosition.Y + 45;
             this.startingArrow.X2 = newPosition.X - 25;
             this.startingArrow.Y2 = newPosition.Y + 25;
 
-            Canvas.SetLeft(this, this.Position.X - this.Size / 2);
-            Canvas.SetTop(this, this.Position.Y - this.Size / 2);
+            Canvas.SetLeft(this, this.position.X - this.Size / 2);
+            Canvas.SetTop(this, this.position.Y - this.Size / 2);
 
             foreach(IConnector connector in this.connectedLinesToThisNode)
             {
@@ -106,6 +109,11 @@ namespace AutomatonBuilder.Entities
             {
                 connector.SetConnectorStart(newPosition);
             }
+        }
+
+        public Point GetPosition()
+        {
+            return this.position;
         }
 
         private void AcceptingClick(object sender, RoutedEventArgs e)

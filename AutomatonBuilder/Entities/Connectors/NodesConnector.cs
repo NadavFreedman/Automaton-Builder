@@ -154,5 +154,10 @@ namespace AutomatonBuilder.Entities.Connectors
             };
             this.SetTextPosition();
         }
+
+        public Point GetPosition()
+        {
+            return this.ConnectorMiddlePoint;
+        }
     }
 }

@@ -9,35 +9,40 @@ using System.Windows.Controls;
 using System.Windows.Shapes;
 using Petzold.Media2D;
 using System.Windows.Media;
+using Newtonsoft.Json;
 
 namespace AutomatonBuilder.Entities
 {
     public class AutomatonContext
     {
+        public class MouseProperties
+        {
+            public bool IsLeftMouseKeyPressed { get; set; }
+            public bool WasLeftMouseKeyPressedLastTick { get; set; }
+            public Point LeftClickHoldStartingPosition { get; set; }
+            public Point LeftClickHoldReleasePosition { get; set; }
+            public Point LastRightClickPosition { get; set; }
+            public IMoveable? HoveredElement { get; set; }
+        }
+
         public readonly List<ModelNode> NodesList;
 
+        [JsonIgnore]
         public readonly Stack<IAction> DoneActionsStack;
 
+        [JsonIgnore]
         public readonly Stack<IAction> UndoneActionsStack;
 
-        public Polyline CurrentLine;
+        [JsonIgnore]
+        public Polyline CurrentLine { get; set; }
 
-        public bool IsLeftMouseKeyPressed;
-
-        public bool WasLeftMouseKeyPressedLastTick;
-
-        public Point LeftClickHoldStartingPosition;
-
-        public Point LeftClickHoldReleasePosition;
-
-        public Point LastRightClickPosition;
+        [JsonIgnore]
+        public MouseProperties MouseProperies { get; set; }
 
         public ModelNode? StartingNode;
 
+        [JsonIgnore]
         public Canvas MainCanvas;
-
-        public IMoveable? HoveredElement { get; set; }
-
 
         public AutomatonContext(Canvas windowCanvas)
         {
@@ -53,10 +58,14 @@ namespace AutomatonBuilder.Entities
             };
             this.MainCanvas = windowCanvas;
             this.MainCanvas.Children.Add(this.CurrentLine);
-            this.LastRightClickPosition = new Point();
-            this.IsLeftMouseKeyPressed = false;
+            this.MouseProperies = new MouseProperties
+            {
+                LastRightClickPosition = new Point(),
+                IsLeftMouseKeyPressed = false,
+                HoveredElement = null,
+            };
             this.StartingNode = null;
-            this.HoveredElement = null;
+            
         }
 
     }

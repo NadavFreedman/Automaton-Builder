@@ -10,5 +10,7 @@ namespace AutomatonBuilder.Interfaces
     public interface IMoveable
     {
         public void SetPosition(Point newPosition);
+
+        public Point GetPosition();
     }
 }

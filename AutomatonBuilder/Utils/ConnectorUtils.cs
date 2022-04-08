@@ -39,7 +39,7 @@ namespace AutomatonBuilder.Utils
         {
             
 
-            NodesConnector connector = new NodesConnector(connectorData, source.Position, destination.Position);
+            NodesConnector connector = new NodesConnector(connectorData, source.GetPosition(), destination.GetPosition());
 
             connector.SetTextPosition();
             connector.AddToCanvasButtom(context.MainCanvas);
@@ -52,7 +52,7 @@ namespace AutomatonBuilder.Utils
 
         private static IConnector ConnectNodeToSelf(AutomatonContext context, ModelNode node, string connectorData, MainWindow host)
         {
-            SelfConnector connector = new SelfConnector(connectorData, node.Position);
+            SelfConnector connector = new SelfConnector(connectorData, node.GetPosition());
             connector.SetTextPosition();
             connector.SetConnectorPosition();
             connector.AddToCanvasButtom(context.MainCanvas);
@@ -96,14 +96,14 @@ namespace AutomatonBuilder.Utils
             connector.AddToCanvasButtom(context.MainCanvas);
         }
 
-        public static ModelNode? GetNodeByName(AutomatonContext context, string nodeName)
+        public static ModelNode GetNodeByName(AutomatonContext context, string nodeName)
         {
             foreach (ModelNode node in context.NodesList)
             {
                 if (node.ToString() == nodeName)
                     return node;
             }
-            return null;   
+            throw new Exception($"No node with the name {nodeName}");
         }
 
         public static double GetAlpha(Point a, Point b)

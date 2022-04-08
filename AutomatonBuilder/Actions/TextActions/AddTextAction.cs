@@ -38,7 +38,7 @@ namespace AutomatonBuilder.Actions.TextActions
 
             this.borderedText.AllowDragging(host);
 
-            this.borderedText.SetPosition(context.LastRightClickPosition);
+            this.borderedText.SetPosition(context.MouseProperies.LastRightClickPosition);
 
             borderedText.AddToCanvas(context.MainCanvas);
         }

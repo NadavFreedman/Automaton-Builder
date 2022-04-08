@@ -35,42 +35,24 @@ namespace AutomatonBuilder
             this.WindowState = WindowState.Maximized;
         }
 
-        /// <summary>
-        /// Handles "Add Node" Click or Ctrl+N
-        /// </summary>
-        /// <param name="sender">The object which fired this event</param>
-        /// <param name="e">Event Arguments</param>
         private void AddNodeMenuItem_Click(object sender, RoutedEventArgs e)
         {
             IAction addNodeAction = new AddNodeAction(this.context, this);
             DoAction(addNodeAction);
         }
 
-        /// <summary>
-        /// Handles removal of a node.
-        /// </summary>
-        /// <param name="node">The node to be removed.</param>
         public void RemoveNode(ModelNode node)
         {
             IAction removeNodeAction = new RemoveNodeAction(this.context, this, node);
             DoAction(removeNodeAction);
         }
 
-
-        /// <summary>
-        /// Connect the sender node to another node
-        /// </summary>
-        /// <param name="sender">The object which fired this event</param>
-        /// <param name="e">Event Arguments</param>
         public void ConnectNodes(object sender, RoutedEventArgs e)
         {
-            //Get the node that is associated to the MenuItem
             ModelNode connectFrom = (ModelNode)((MenuItem)sender).Tag;
-            ModelNode connectTo = ConnectorUtils.GetNodeByName(this.context, ((MenuItem)sender).Header.ToString());
+            ModelNode connectTo = ConnectorUtils.GetNodeByName(this.context, ((MenuItem)sender).Header.ToString()!);
 
-
-            //Get the Text to be written on the arrow
-            ConnectorInput connectorInputWindow = new ConnectorInput(connectFrom.ToString(), connectTo.ToString());
+            ConnectorInput connectorInputWindow = new(connectFrom.ToString(), connectTo.ToString());
             connectorInputWindow.ShowDialog();
             string input;
             if (connectorInputWindow.DialogResult == true)
@@ -82,11 +64,6 @@ namespace AutomatonBuilder
             DoAction(connectAction);
         }
 
-        /// <summary>
-        /// Handles "Remove" click
-        /// </summary>
-        /// <param name="sender">The object which fired this event</param>
-        /// <param name="e">Event Arguments</param>
         public void RemoveConnector_Click(object sender, RoutedEventArgs e)
         {
             IConnector connector = (IConnector)((MenuItem)sender).Tag;
@@ -102,28 +79,19 @@ namespace AutomatonBuilder
 
         }
 
-        /// <summary>
-        /// Handles mouse movement
-        /// </summary>
-        /// <param name="sender">The object which fired this event</param>
-        /// <param name="e">Event Arguments</param>
         private void MyCanvas_MouseMove(object sender, MouseEventArgs e)
         {
-            this.context.WasLeftMouseKeyPressedLastTick = this.context.IsLeftMouseKeyPressed;
-            this.context.IsLeftMouseKeyPressed = e.LeftButton == MouseButtonState.Pressed;
+            this.context.MouseProperies.WasLeftMouseKeyPressedLastTick = this.context.MouseProperies.IsLeftMouseKeyPressed;
+            this.context.MouseProperies.IsLeftMouseKeyPressed = e.LeftButton == MouseButtonState.Pressed;
 
-            if (Keyboard.IsKeyDown(Key.LeftShift)) { }
-            else if (this.context.IsLeftMouseKeyPressed)
+            if (this.context.MouseProperies.IsLeftMouseKeyPressed)
             {
-                if (!this.context.WasLeftMouseKeyPressedLastTick)
-                    this.context.LeftClickHoldStartingPosition = e.GetPosition(this);
-
                 if (Keyboard.IsKeyDown(Key.LeftCtrl))
                 {
                     if (this.context.CurrentLine.Points.Count != 0)
                     {
-                        IAction drawingAction = new DrawLineAction(this.context);
-                        DoAction(drawingAction);
+                        IAction drawLineAction = new DrawLineAction(this.context);
+                        DoAction(drawLineAction);
                     }
 
                     if (Mouse.DirectlyOver is Polyline line)
@@ -132,30 +100,38 @@ namespace AutomatonBuilder
                         DoAction(deleteLineAction);
                     }
                 }
-                else if (this.context.HoveredElement is null)
+                else if (this.context.MouseProperies.HoveredElement is null)
                 {
+                    if (!this.context.MouseProperies.WasLeftMouseKeyPressedLastTick)
+                        this.context.MouseProperies.LeftClickHoldStartingPosition = e.GetPosition(this);
+
                     this.context.CurrentLine.Points.Add(e.GetPosition(this));
                 }
                 else
                 {
-                    this.context.HoveredElement.SetPosition(e.GetPosition(this));
+                    if (!this.context.MouseProperies.WasLeftMouseKeyPressedLastTick)
+                        this.context.MouseProperies.LeftClickHoldStartingPosition = this.context.MouseProperies.HoveredElement.GetPosition();
+
+                    this.context.MouseProperies.HoveredElement.SetPosition(e.GetPosition(this));
                 }
                 
             }
             else
             {
-                if (this.context.WasLeftMouseKeyPressedLastTick)
+                if (this.context.MouseProperies.WasLeftMouseKeyPressedLastTick)
                 {
-                    this.context.LeftClickHoldReleasePosition = e.GetPosition(this);
+                    this.context.MouseProperies.LeftClickHoldReleasePosition = e.GetPosition(this);
 
                     if (this.context.CurrentLine!.Points.Count != 0)
                     {
                         IAction drawingAction = new DrawLineAction(context);
                         DoAction(drawingAction);
                     }
-                    else if (this.context.HoveredElement is not null)
+                    else if (this.context.MouseProperies.HoveredElement is not null)
                     {
-                        IAction moveTextAction = new MoveElementAction(this.context.HoveredElement, this.context.LeftClickHoldStartingPosition, this.context.LeftClickHoldReleasePosition);
+                        IAction moveTextAction = new MoveElementAction(this.context.MouseProperies.HoveredElement, 
+                            this.context.MouseProperies.LeftClickHoldStartingPosition, 
+                            this.context.MouseProperies.LeftClickHoldReleasePosition);
                         DoAction(moveTextAction);
                     }
                 }
@@ -165,31 +141,30 @@ namespace AutomatonBuilder
 
         public void GeneralElement_MouseEnter(object sender, MouseEventArgs e)
         {
+            if (this.context.MouseProperies.HoveredElement is not null) return;
+            if (this.context.MouseProperies.WasLeftMouseKeyPressedLastTick) return;
             IMoveable hovered = (IMoveable)sender;
-            this.context.HoveredElement = hovered;
+            this.context.MouseProperies.HoveredElement = hovered;
         }
 
         public void Element_MouseLeave(object sender, MouseEventArgs e)
         {
-            if (!this.context.IsLeftMouseKeyPressed)
-                this.context.HoveredElement = null;
+            if (!this.context.MouseProperies.IsLeftMouseKeyPressed)
+                this.context.MouseProperies.HoveredElement = null;
         }
 
         public void TaggedElement_MouseEnter(object sender, MouseEventArgs e)
         {
-            this.context.HoveredElement = (IMoveable)((FrameworkElement)sender).Tag;
+            if (this.context.MouseProperies.HoveredElement is not null) return;
+            if (this.context.MouseProperies.WasLeftMouseKeyPressedLastTick) return;
+            this.context.MouseProperies.HoveredElement = (IMoveable)((FrameworkElement)sender).Tag;
         }
 
 
-        /// <summary>
-        /// Handles the pressing of the key.
-        /// </summary>
-        /// <param name="sender">The object which fired this event</param>
-        /// <param name="e">Event Arguments</param>
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
             //If the left mouse key is pressed then don't do anything
-            if (!this.context.IsLeftMouseKeyPressed)
+            if (!this.context.MouseProperies.IsLeftMouseKeyPressed)
             {
                 //If the user holds Ctrl
                 if (Keyboard.IsKeyDown(Key.LeftCtrl))
@@ -202,12 +177,12 @@ namespace AutomatonBuilder
                         SaveBtn_Click(null, null);
                     else if (e.Key == Key.T) //Add text
                     {
-                        this.context.LastRightClickPosition = Mouse.GetPosition(this.MainCanvas);
+                        this.context.MouseProperies.LastRightClickPosition = Mouse.GetPosition(this.MainCanvas);
                         AddTextMenuItem_Click(null, null);
                     }
                     else if (e.Key == Key.N) //Add node
                     {
-                        this.context.LastRightClickPosition = Mouse.GetPosition(this.MainCanvas);
+                        this.context.MouseProperies.LastRightClickPosition = Mouse.GetPosition(this.MainCanvas);
                         AddNodeMenuItem_Click(null, null);
                     }
                 }
@@ -215,17 +190,12 @@ namespace AutomatonBuilder
         }
 
 
-        /// <summary>
-        /// Handles the "Add Text".
-        /// </summary>
-        /// <param name="sender">The object which fired this event</param>
-        /// <param name="e">Event Arguments</param>
         private void AddTextMenuItem_Click(object sender, RoutedEventArgs e)
         {
             //Open an input dialog
             ConnectorInput connectorInputWindow = new ConnectorInput("Add Text");
             connectorInputWindow.ShowDialog();
-            string input = "";
+            string input;
             if (connectorInputWindow.DialogResult == true)
                 input = connectorInputWindow.Input;
             else
@@ -235,63 +205,44 @@ namespace AutomatonBuilder
             DoAction(addTextAction);
         }
 
-        /// <summary>
-        /// Saves the current position of the mouse to a field.
-        /// </summary>
-        /// <param name="sender">The object which fired this event</param>
-        /// <param name="e">Event Arguments</param>
         private void Window_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            this.context.LastRightClickPosition = Mouse.GetPosition(this.MainCanvas);
+            this.context.MouseProperies.LastRightClickPosition = Mouse.GetPosition(this.MainCanvas);
         }
 
-
-        /// <summary>
-        /// Handles Save Click
-        /// </summary>
-        /// <param name="sender">The object which fired this event</param>
-        /// <param name="e">Event Arguments</param>
         private void SaveBtn_Click(object sender, RoutedEventArgs e)
         {
-            //Hide the tool bar
-            this.MainToolBar.Visibility = Visibility.Hidden;
-
-            //Save the screen to bitmap
-            RenderTargetBitmap rtb = new RenderTargetBitmap((int)this.MainCanvas.ActualWidth, (int)this.MainCanvas.ActualHeight, 96, 96, PixelFormats.Pbgra32);
-            rtb.Render(this.MainCanvas);
-            PngBitmapEncoder png = new PngBitmapEncoder();
-            png.Frames.Add(BitmapFrame.Create(rtb));
-            MemoryStream stream = new MemoryStream();
-            png.Save(stream);
-            System.Drawing.Image image = System.Drawing.Image.FromStream(stream);
-
             //Open a save dialog
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
-                Filter = "Images|*.png",
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                Filter = "Images (.png)|*.png|Editable Automaton File (.aut)|*.aut",
             };
 
-            //Default format
-            ImageFormat format = ImageFormat.Png;
+
 
             //Save the file
-            if (saveFileDialog.ShowDialog() == DialogResult)
+            if (saveFileDialog.ShowDialog().GetValueOrDefault())
             {
-                image.Save(saveFileDialog.FileName, format);
-                MessageBox.Show("The model has been saved successfully.", "Copied successfully", MessageBoxButton.OK, MessageBoxImage.Information);
+                string extension = System.IO.Path.GetExtension(saveFileDialog.FileName);
+
+                switch (extension)
+                {
+                    case ".png":
+                        SavingUtils.SaveAsPng(this, saveFileDialog.FileName);
+                        break;
+                    case ".aut":
+                        SavingUtils.SaveAsAut(this, saveFileDialog.FileName);
+                        break;
+                    default:
+                        throw new Exception("Invalid file format");
+                }
             }
 
             //Show the tool bar
             this.MainToolBar.Visibility = Visibility.Visible;
         }
 
-
-        /// <summary>
-        /// Handles "Undo" Click
-        /// </summary>
-        /// <param name="sender">The object which fired this event</param>
-        /// <param name="e">Event Arguments</param>
         private void UndoBtn_Click(object sender, RoutedEventArgs e)
         {
             if (this.context.DoneActionsStack.Count != 0)
@@ -307,11 +258,6 @@ namespace AutomatonBuilder
             }
         }
 
-        /// <summary>
-        /// Handles "Redo" Click
-        /// </summary>
-        /// <param name="sender">The object which fired this event</param>
-        /// <param name="e">Event Arguments</param>
         private void RedoBtn_Click(object sender, RoutedEventArgs e)
         {
             if (this.context.UndoneActionsStack.Count != 0)

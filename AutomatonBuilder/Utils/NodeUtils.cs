@@ -46,7 +46,7 @@ namespace AutomatonBuilder.Utils
         public static ModelNode CreateAndAddNode(AutomatonContext context, MainWindow host)
         {
             //Create the new node
-            ModelNode node = new(context.NodesList.Count, host, context.LastRightClickPosition);
+            ModelNode node = new(context.NodesList.Count, host, context.MouseProperies.LastRightClickPosition);
 
             node.MouseEnter += host.GeneralElement_MouseEnter;
             node.MouseLeave += host.Element_MouseLeave;
@@ -56,7 +56,7 @@ namespace AutomatonBuilder.Utils
                 node.Starting = true;
             //Add the node to the Canvas
 
-            node.SetPosition(context.LastRightClickPosition);
+            node.SetPosition(context.MouseProperies.LastRightClickPosition);
 
             NodeUtils.AddNode(context, node, host);
 

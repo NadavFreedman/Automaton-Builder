@@ -17,6 +17,7 @@ namespace AutomatonBuilder.Entities.TextElements
         public Border Border { get; private set; }
         private readonly TextBlock block;
         private FormattedText formattedText;
+        private Point position;
 
         public BorderedText(string text)
         {
@@ -34,6 +35,7 @@ namespace AutomatonBuilder.Entities.TextElements
 
         public void SetPosition(Point newPosition)
         {
+            this.position = newPosition;
             Canvas.SetLeft(this.Border, newPosition.X - 2 - this.formattedText.Width / 2);
             Canvas.SetTop(this.Border, newPosition.Y - 2 - this.formattedText.Height / 2);
         }
@@ -60,6 +62,11 @@ namespace AutomatonBuilder.Entities.TextElements
         internal void AttachContextMenu(ContextMenu menu)
         {
             this.block.ContextMenu = menu;
+        }
+
+        public Point GetPosition()
+        {
+            return this.position;
         }
     }
 }
