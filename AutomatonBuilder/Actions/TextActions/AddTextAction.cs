@@ -3,6 +3,7 @@ using AutomatonBuilder.Utils;
 using AutomatonBuilder.Interfaces;
 using System.Windows.Controls;
 using AutomatonBuilder.Entities.TextElements;
+using AutomatonBuilder.Entities.Contexts;
 
 namespace AutomatonBuilder.Actions.TextActions
 {
@@ -23,18 +24,11 @@ namespace AutomatonBuilder.Actions.TextActions
         {
             //Create a text block
             this.borderedText = new(this.text);
+            this.context.BorderedTextsList.Add(this.borderedText);
+
 
             //Add a context menu to the text block
-            var contextMenu = new ContextMenu();
-            MenuItem removeTextItem = new MenuItem
-            {
-                Header = "Remove",
-                Tag = borderedText
-            };
-            removeTextItem.Click += this.host.RemoveText_Click;
-            contextMenu.Items.Add(removeTextItem);
-
-            this.borderedText.AttachContextMenu(contextMenu);
+            TextUtils.AddContextMenuToText(this.borderedText, host);
 
             this.borderedText.AllowDragging(host);
 
@@ -46,11 +40,13 @@ namespace AutomatonBuilder.Actions.TextActions
         public void RedoAction()
         {
             this.borderedText!.AddToCanvas(this.context.MainCanvas);
+            this.context.BorderedTextsList.Add(this.borderedText);
         }
 
         public void UndoAction()
         {
             this.borderedText!.RemoveFromCanvas(this.context.MainCanvas);
+            this.context.BorderedTextsList.Remove(this.borderedText);
         }
     }
 }

@@ -17,6 +17,7 @@ using AutomatonBuilder.Entities.TextElements;
 using AutomatonBuilder.Actions.MovementActions;
 using AutomatonBuilder.Actions.DrawingActions;
 using AutomatonBuilder.Utils;
+using AutomatonBuilder.Entities.Contexts;
 
 namespace AutomatonBuilder
 {
@@ -26,7 +27,7 @@ namespace AutomatonBuilder
     public partial class MainWindow : Window
     {
 
-        public readonly AutomatonContext context;
+        public AutomatonContext context;
 
         public MainWindow()
         {
@@ -216,7 +217,7 @@ namespace AutomatonBuilder
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                Filter = "Images (.png)|*.png|Editable Automaton File (.aut)|*.aut",
+                Filter = "Editable Automaton Files (.eaf)|*.eaf|Images (.png)|*.png",
             };
 
 
@@ -231,7 +232,7 @@ namespace AutomatonBuilder
                     case ".png":
                         SavingUtils.SaveAsPng(this, saveFileDialog.FileName);
                         break;
-                    case ".aut":
+                    case ".eaf":
                         SavingUtils.SaveAsAut(this, saveFileDialog.FileName);
                         break;
                     default:
@@ -239,8 +240,7 @@ namespace AutomatonBuilder
                 }
             }
 
-            //Show the tool bar
-            this.MainToolBar.Visibility = Visibility.Visible;
+
         }
 
         private void UndoBtn_Click(object sender, RoutedEventArgs e)
@@ -280,6 +280,22 @@ namespace AutomatonBuilder
             this.context.UndoneActionsStack.Clear();
             this.RedoBtn.IsEnabled = false;
             this.UndoBtn.IsEnabled = true;
+        }
+
+        private void LoadBtn_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog saveFileDialog = new OpenFileDialog
+            {
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                Filter = "Editable Automaton Files (.eaf)|*.eaf",
+            };
+
+            if (saveFileDialog.ShowDialog().GetValueOrDefault())
+            {
+                this.MainCanvas.Children.Clear();
+                this.MainCanvas.Children.Add(this.MainToolBar);
+                this.context = SavingUtils.LoadContextFromFile(this, saveFileDialog.FileName);
+            }
         }
     }
 }

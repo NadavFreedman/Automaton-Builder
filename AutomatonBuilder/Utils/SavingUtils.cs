@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using AutomatonBuilder.Entities.Contexts;
+using AutomatonBuilder.Entities.Nodes;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -17,7 +19,6 @@ namespace AutomatonBuilder.Utils
     {
         public static void SaveAsPng(MainWindow host, string filePath)
         {
-            //Hide the tool bar
             host.MainToolBar.Visibility = Visibility.Hidden;
 
             //Save the screen to bitmap
@@ -30,13 +31,25 @@ namespace AutomatonBuilder.Utils
             System.Drawing.Image image = System.Drawing.Image.FromStream(stream);
             image.Save(filePath, ImageFormat.Png);
             MessageBox.Show("The model has been saved as an image successfully.", "Saved successfully", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            host.MainToolBar.Visibility = Visibility.Visible;
         }
 
         public static void SaveAsAut(MainWindow mainWindow, string filePath)
         {
-            var savedJson = JsonConvert.SerializeObject(mainWindow.context);
-            File.WriteAllText(filePath, savedJson);
+            JsonContext contextToSave = new JsonContext(mainWindow.context);
+
+            File.WriteAllText(filePath, JsonConvert.SerializeObject(contextToSave));
             MessageBox.Show("The model has been saved successfully.", "Saved successfully", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        public static AutomatonContext LoadContextFromFile(MainWindow mainWindow, string filePath)
+        {
+            string jsonString = File.ReadAllText(filePath);
+
+            JsonContext savedContext = JsonConvert.DeserializeObject<JsonContext>(jsonString);
+
+            return savedContext.ToContext(mainWindow.MainCanvas, mainWindow);
         }
     }
 }

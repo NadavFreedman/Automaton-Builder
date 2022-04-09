@@ -46,6 +46,11 @@ namespace AutomatonBuilder.Entities.TextElements
             this.formattedText = TextUtils.CreateFormattedText(this.block);
         }
 
+        public string GetText()
+        {
+            return this.block.Text;
+        }
+
         public void AddToCanvas(Canvas mainCanvas, ZAxis z = ZAxis.Top)
         {
             if (z == ZAxis.Top)

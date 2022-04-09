@@ -1,5 +1,6 @@
 ﻿using AutomatonBuilder.Entities;
 using AutomatonBuilder.Entities.Connectors;
+using AutomatonBuilder.Entities.Contexts;
 using AutomatonBuilder.Entities.TextElements;
 using AutomatonBuilder.Interfaces;
 using System;
@@ -25,9 +26,9 @@ namespace AutomatonBuilder.Utils
 
             foreach (var node in context.NodesList)
             {
-                if (node.connectedLinesFromThisNode.Contains(connector) || node.connectedLinesToThisNode.Contains(connector))
+                if (node.ConnectedLinesFromThisNode.ContainsKey(connector) || node.ConnectedLinesToThisNode.ContainsKey(connector))
                 {
-                    node.connectedLinesFromThisNode.Remove(connector);
+                    node.ConnectedLinesFromThisNode.Remove(connector);
                     disconnectedNodes.Add(node);
                 }
             }
@@ -37,15 +38,14 @@ namespace AutomatonBuilder.Utils
 
         private static IConnector ConnectNodeToAnotherNode(AutomatonContext context, ModelNode source, ModelNode destination, string connectorData, MainWindow host)
         {
-            
-
             NodesConnector connector = new NodesConnector(connectorData, source.GetPosition(), destination.GetPosition());
 
             connector.SetTextPosition();
             connector.AddToCanvasButtom(context.MainCanvas);
+
             connector.BindConnectorToMainWindow(host);
-            source.connectedLinesFromThisNode.Add(connector);
-            destination.connectedLinesToThisNode.Add(connector);
+            source.ConnectedLinesFromThisNode[connector] = destination;
+            destination.ConnectedLinesToThisNode[connector] = source;
 
             return connector;
         }
@@ -58,7 +58,7 @@ namespace AutomatonBuilder.Utils
             connector.AddToCanvasButtom(context.MainCanvas);
             connector.BindConnectorToMainWindow(host);
 
-            node.connectedLinesFromThisNode.Add(connector);
+            node.ConnectedLinesFromThisNode[connector] = node;
 
             return connector;
         }
@@ -91,8 +91,8 @@ namespace AutomatonBuilder.Utils
 
         public static void ReconnectConnector(AutomatonContext context, IConnector connector, ModelNode source, ModelNode? destination = null)
         {
-            source.connectedLinesFromThisNode.Add(connector);
-            destination?.connectedLinesToThisNode.Add(connector);
+            source.ConnectedLinesFromThisNode[connector] = destination ?? source;
+            destination?.ConnectedLinesToThisNode.Add(connector, source);
             connector.AddToCanvasButtom(context.MainCanvas);
         }
 

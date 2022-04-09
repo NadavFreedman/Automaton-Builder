@@ -1,4 +1,5 @@
 ﻿using AutomatonBuilder.Entities;
+using AutomatonBuilder.Entities.Contexts;
 using AutomatonBuilder.Interfaces;
 using AutomatonBuilder.Utils;
 using System;
@@ -29,7 +30,7 @@ namespace AutomatonBuilder.Actions.NodeActions
 
         public void RedoAction()
         {
-            NodeUtils.AddNode(this.context, this.createdNode!, this.host);
+            NodeUtils.AddNodeToCanvas(this.context, this.createdNode!, this.host);
         }
 
         public void UndoAction()

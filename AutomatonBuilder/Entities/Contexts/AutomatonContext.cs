@@ -10,8 +10,9 @@ using System.Windows.Shapes;
 using Petzold.Media2D;
 using System.Windows.Media;
 using Newtonsoft.Json;
+using AutomatonBuilder.Entities.TextElements;
 
-namespace AutomatonBuilder.Entities
+namespace AutomatonBuilder.Entities.Contexts
 {
     public class AutomatonContext
     {
@@ -27,27 +28,28 @@ namespace AutomatonBuilder.Entities
 
         public readonly List<ModelNode> NodesList;
 
-        [JsonIgnore]
+        public readonly List<BorderedText> BorderedTextsList;
+
+        public readonly List<Polyline> DrawnLinesList;
+
         public readonly Stack<IAction> DoneActionsStack;
 
-        [JsonIgnore]
         public readonly Stack<IAction> UndoneActionsStack;
 
-        [JsonIgnore]
         public Polyline CurrentLine { get; set; }
 
-        [JsonIgnore]
         public MouseProperties MouseProperies { get; set; }
 
         public ModelNode? StartingNode;
 
-        [JsonIgnore]
         public Canvas MainCanvas;
 
         public AutomatonContext(Canvas windowCanvas)
         {
             this.StartingNode = null;
             this.NodesList = new List<ModelNode>();
+            this.BorderedTextsList = new List<BorderedText>();
+            this.DrawnLinesList = new List<Polyline>();
             this.UndoneActionsStack = new Stack<IAction>();
             this.DoneActionsStack = new Stack<IAction>();
             this.CurrentLine = new Polyline

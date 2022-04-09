@@ -7,6 +7,7 @@ using AutomatonBuilder.Interfaces;
 using System.Windows.Shapes;
 using System.Windows.Media;
 using AutomatonBuilder.Entities;
+using AutomatonBuilder.Entities.Contexts;
 
 namespace AutomatonBuilder.Actions.DrawingActions
 {
@@ -22,6 +23,7 @@ namespace AutomatonBuilder.Actions.DrawingActions
         }
         public void DoAction()
         {
+            this.context.DrawnLinesList.Add(this.drawnLine);
             this.context.CurrentLine = new Polyline
             {
                 Stroke = Brushes.Black,
@@ -34,11 +36,13 @@ namespace AutomatonBuilder.Actions.DrawingActions
         public void RedoAction()
         {
             this.context.MainCanvas.Children.Add(this.drawnLine);
+            this.context.DrawnLinesList.Add(this.drawnLine);
         }
 
         public void UndoAction()
         {
             this.context.MainCanvas.Children.Remove(this.drawnLine);
+            this.context.DrawnLinesList.Remove(this.drawnLine);
         }
     }
 }

@@ -24,22 +24,21 @@ namespace AutomatonBuilder.Entities
     /// </summary>
     public partial class ModelNode : UserControl, IMoveable
     {
-        public int Size { get; set; }
+        private int size;
 
-        private bool accepting;
+        public bool Accepting { get; set; }
 
-        public bool Starting;
+        public bool Starting { get; set; }
 
         [JsonIgnore]
-        public ArrowLine startingArrow;
+        public ArrowLine StartingArrow { get; set; }
 
         [JsonIgnore]
         private readonly MainWindow root;
 
         private Point position;
-
-        public List<IConnector> connectedLinesToThisNode;
-        public List<IConnector> connectedLinesFromThisNode;
+        public Dictionary<IConnector, ModelNode> ConnectedLinesToThisNode { get; set; }
+        public Dictionary<IConnector, ModelNode> ConnectedLinesFromThisNode { get; set; }
 
 
         private int index;
@@ -50,13 +49,12 @@ namespace AutomatonBuilder.Entities
             InitializeComponent();
             this.Index = index;
             this.root = host;
-            this.accepting = false;
+            this.Accepting = false;
             this.Resize(70);
-            this.position = new Point();
             this.Starting = false;
             this.position = pos;
 
-            this.startingArrow = new ArrowLine()
+            this.StartingArrow = new ArrowLine()
             {
                 Visibility = Visibility.Visible,
                 StrokeThickness = 3,
@@ -69,15 +67,15 @@ namespace AutomatonBuilder.Entities
                 Y2 = pos.Y + 25
             };
 
-            this.connectedLinesToThisNode = new List<IConnector>();
-            this.connectedLinesFromThisNode = new List<IConnector>();
+            this.ConnectedLinesToThisNode = new Dictionary<IConnector, ModelNode>();
+            this.ConnectedLinesFromThisNode = new Dictionary<IConnector, ModelNode>();
         }
 
         public void Resize(int size)
         {
             MainViewBox.Width = size;
             MainViewBox.Height = size;
-            this.Size = size;
+            this.size = size;
         }
 
         private void RemoveNodeClick(object sender, RoutedEventArgs e)
@@ -93,19 +91,19 @@ namespace AutomatonBuilder.Entities
         public void SetPosition(Point newPosition)
         {
             this.position = newPosition;
-            this.startingArrow.X1 = newPosition.X - 45;
-            this.startingArrow.Y1 = newPosition.Y + 45;
-            this.startingArrow.X2 = newPosition.X - 25;
-            this.startingArrow.Y2 = newPosition.Y + 25;
+            this.StartingArrow.X1 = newPosition.X - 45;
+            this.StartingArrow.Y1 = newPosition.Y + 45;
+            this.StartingArrow.X2 = newPosition.X - 25;
+            this.StartingArrow.Y2 = newPosition.Y + 25;
 
-            Canvas.SetLeft(this, this.position.X - this.Size / 2);
-            Canvas.SetTop(this, this.position.Y - this.Size / 2);
+            Canvas.SetLeft(this, this.position.X - this.size / 2);
+            Canvas.SetTop(this, this.position.Y - this.size / 2);
 
-            foreach(IConnector connector in this.connectedLinesToThisNode)
+            foreach(IConnector connector in this.ConnectedLinesToThisNode.Keys)
             {
                 connector.SetConnectorEnd(newPosition);
             }
-            foreach (IConnector connector in this.connectedLinesFromThisNode)
+            foreach (IConnector connector in this.ConnectedLinesFromThisNode.Keys)
             {
                 connector.SetConnectorStart(newPosition);
             }
@@ -116,9 +114,9 @@ namespace AutomatonBuilder.Entities
             return this.position;
         }
 
-        private void AcceptingClick(object sender, RoutedEventArgs e)
+        public void AcceptingClick(object sender, RoutedEventArgs e)
         {
-            if (this.accepting)
+            if (this.Accepting)
             {
                 this.AcceptingMenuItem.Header = "Accepting";
                 this.AcceptingElipse.Visibility = Visibility.Collapsed;
@@ -128,12 +126,13 @@ namespace AutomatonBuilder.Entities
                 this.AcceptingMenuItem.Header = "Not accepting";
                 this.AcceptingElipse.Visibility = Visibility.Visible;
             }
-            this.accepting = !this.accepting;
+            this.Accepting = !this.Accepting;
         }
 
         private void StartingMenuItem_Click(object sender, RoutedEventArgs e)
         {
             NodeUtils.ToggleNodeStarting(this.root.context, this);
         }
+
     }
 }

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Shapes;
+using AutomatonBuilder.Entities.Contexts;
 
 namespace AutomatonBuilder.Actions.NodeActions
 {
@@ -37,7 +38,7 @@ namespace AutomatonBuilder.Actions.NodeActions
 
         public void UndoAction()
         {
-            NodeUtils.AddNode(this.context, this.node!, this.host);
+            NodeUtils.AddNodeToCanvas(this.context, this.node!, this.host);
         }
     }
 }

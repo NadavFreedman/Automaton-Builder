@@ -1,4 +1,5 @@
 ﻿using AutomatonBuilder.Entities;
+using AutomatonBuilder.Entities.Contexts;
 using AutomatonBuilder.Interfaces;
 using System.Windows.Controls;
 
@@ -10,13 +11,13 @@ namespace AutomatonBuilder.Utils
         private static void SetStartingNodeToNull(AutomatonContext context)
         {
             if (context.StartingNode != null)
-                context.MainCanvas.Children.Remove(context.StartingNode.startingArrow);
+                context.MainCanvas.Children.Remove(context.StartingNode.StartingArrow);
             context.StartingNode = null;
         }
         private static void SetStartingNodeToNode(AutomatonContext context, ModelNode node)
         {
             //Add the starting arrow to the canvas
-            context.MainCanvas.Children.Add(node.startingArrow);
+            context.MainCanvas.Children.Add(node.StartingArrow);
 
             //if there was a starting node, toggle it.
             if (context.StartingNode != null)
@@ -58,21 +59,21 @@ namespace AutomatonBuilder.Utils
 
             node.SetPosition(context.MouseProperies.LastRightClickPosition);
 
-            NodeUtils.AddNode(context, node, host);
+            NodeUtils.AddNodeToCanvas(context, node, host);
 
             return node;
         }
 
-        public static void AddNode(AutomatonContext context, ModelNode nodeToAdd ,MainWindow host)
+        public static void AddNodeToCanvas(AutomatonContext context, ModelNode nodeToAdd ,MainWindow host)
         {
             nodeToAdd.Index = context.NodesList.Count;
 
             //Add each line connected to the node.
-            foreach (IConnector connector in nodeToAdd.connectedLinesToThisNode)
+            foreach (IConnector connector in nodeToAdd.ConnectedLinesToThisNode.Keys)
             {
                 connector.AddToCanvasButtom(context.MainCanvas);
             }
-            foreach (IConnector connector in nodeToAdd.connectedLinesFromThisNode)
+            foreach (IConnector connector in nodeToAdd.ConnectedLinesFromThisNode.Keys)
             {
                 connector.AddToCanvasButtom(context.MainCanvas);
             }
@@ -101,12 +102,12 @@ namespace AutomatonBuilder.Utils
 
 
             //Remove each line connected to the node.
-            foreach (IConnector connector in nodeToRemove.connectedLinesFromThisNode)
+            foreach (IConnector connector in nodeToRemove.ConnectedLinesFromThisNode.Keys)
             {
                 connector.RemoveFromCanvas(context.MainCanvas);
             }
 
-            foreach (IConnector connector in nodeToRemove.connectedLinesToThisNode)
+            foreach (IConnector connector in nodeToRemove.ConnectedLinesToThisNode.Keys)
             {
                 connector.RemoveFromCanvas(context.MainCanvas);
             }
