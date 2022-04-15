@@ -1,0 +1,90 @@
+﻿<Window x:Class="AutomatonBuilder.Modals.TextInputWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AutomatonBuilder.Modals" xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+        Title="Text Input" Height="250" Width="400">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="10"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="10"/>
+        </Grid.RowDefinitions>
+
+        <TextBox x:Name="InputBox" 
+                 Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="7" Grid.RowSpan="6" Margin="2, 5"
+                 FontSize="16" TextWrapping="Wrap" KeyDown="InputBox_KeyDown"/>
+
+        <ComboBox Name="FontSizeComboBox" Margin="10, 0" 
+                  Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
+                  FontSize="12" 
+                  VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                  SelectionChanged="FontSizeComboBox_SelectionChanged">
+            <ComboBoxItem>8</ComboBoxItem>
+            <ComboBoxItem>9</ComboBoxItem>
+            <ComboBoxItem>10</ComboBoxItem>
+            <ComboBoxItem>11</ComboBoxItem>
+            <ComboBoxItem IsSelected="True">12</ComboBoxItem>
+            <ComboBoxItem>14</ComboBoxItem>
+            <ComboBoxItem>16</ComboBoxItem>
+            <ComboBoxItem>18</ComboBoxItem>
+            <ComboBoxItem>20</ComboBoxItem>
+            <ComboBoxItem>22</ComboBoxItem>
+            <ComboBoxItem>24</ComboBoxItem>
+            <ComboBoxItem>26</ComboBoxItem>
+        </ComboBox>
+
+        <xctk:ColorPicker Name="ColorPicker" DisplayColorAndName="True" 
+                          Grid.Row="1" Grid.Column="3" Margin="10, 0" Grid.ColumnSpan="2"
+                          AvailableColorsSortingMode="HueSaturationBrightness" 
+                          SelectedColor="Black" SelectedColorChanged="ColorPicker_SelectedColorChanged">
+            
+        </xctk:ColorPicker>
+
+        <Grid Grid.Row="1" Grid.Column="5" Grid.ColumnSpan="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <ToggleButton x:Name="BoldToggle" Grid.Column="0" Grid.Row="0" Click="BoldToggle_Click">
+                <TextBlock FontSize="16" TextAlignment="Center" FontWeight="Bold" >
+                    B
+                </TextBlock>
+            </ToggleButton>
+            <ToggleButton x:Name="AlignLeftToggle" Grid.Column="1" Grid.Row="0" Click="AlignLeftToggle_Click" IsChecked="True">
+                <Image Source="/Icons/AlignLeftIcon.png"/>
+            </ToggleButton>
+            <ToggleButton x:Name="AlignCenterToggle" Grid.Column="2" Grid.Row="0" Click="AlignCenterToggle_Click">
+                <Image Source="/Icons/AlignCenterIcon.png"/>
+            </ToggleButton>
+            <ToggleButton x:Name="AlignRightToggle" Grid.Column="3" Grid.Row="0" Click="AlignRightToggle_Click">
+                <Image Source="/Icons/AlignRightIcon.png"/>
+            </ToggleButton>
+        </Grid>
+
+
+        <Button x:Name="AddBtn" Content="Add" Click="AddBtn_Click" Grid.Row="8" Grid.Column="3" Grid.ColumnSpan="3" FontSize="12" Margin="5, 2"/>
+    </Grid>
+</Window>

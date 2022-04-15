@@ -14,10 +14,10 @@ namespace AutomatonBuilder.Actions.NodeActions
     public class AddNodeAction : IAction
     {
         private readonly AutomatonContext context;
-        private readonly MainWindow host;
+        private readonly MainEditingScreen host;
         private ModelNode? createdNode;
 
-        public AddNodeAction(AutomatonContext context, MainWindow host)
+        public AddNodeAction(AutomatonContext context, MainEditingScreen host)
         {
             this.context = context;
             this.host = host;

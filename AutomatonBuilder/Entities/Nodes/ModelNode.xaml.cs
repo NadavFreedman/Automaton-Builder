@@ -34,7 +34,7 @@ namespace AutomatonBuilder.Entities
         public ArrowLine StartingArrow { get; set; }
 
         [JsonIgnore]
-        private readonly MainWindow root;
+        private readonly MainEditingScreen root;
 
         private Point position;
         public Dictionary<IConnector, ModelNode> ConnectedLinesToThisNode { get; set; }
@@ -44,7 +44,7 @@ namespace AutomatonBuilder.Entities
         private int index;
         public int Index { get { return index; } set { this.index = value; this.IndexText.Text = this.index.ToString(); } }
 
-        public ModelNode(int index, MainWindow host, Point pos)
+        public ModelNode(int index, MainEditingScreen host, Point pos)
         {
             InitializeComponent();
             this.Index = index;
@@ -52,23 +52,18 @@ namespace AutomatonBuilder.Entities
             this.Accepting = false;
             this.Resize(70);
             this.Starting = false;
-            this.position = pos;
 
             this.StartingArrow = new ArrowLine()
             {
                 Visibility = Visibility.Visible,
                 StrokeThickness = 3,
                 Stroke = Brushes.Black,
-
-                X1 = pos.X - 45,
-                Y1 = pos.Y + 45,
-
-                X2 = pos.X - 25,
-                Y2 = pos.Y + 25
             };
 
             this.ConnectedLinesToThisNode = new Dictionary<IConnector, ModelNode>();
             this.ConnectedLinesFromThisNode = new Dictionary<IConnector, ModelNode>();
+
+            this.SetPosition(pos);
         }
 
         public void Resize(int size)

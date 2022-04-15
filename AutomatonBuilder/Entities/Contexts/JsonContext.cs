@@ -44,9 +44,9 @@ namespace AutomatonBuilder.Entities.Contexts
 
         public JsonContext() { }
 
-        public AutomatonContext ToContext(Canvas mainCanvas, MainWindow host)
+        public AutomatonContext ToContext(Canvas mainCanvas, MainEditingScreen host)
         {
-            AutomatonContext context = new AutomatonContext(mainCanvas);
+            AutomatonContext context = new AutomatonContext(mainCanvas, host);
 
             LoadNodes(context, host);
             LoadConnections(context, host);
@@ -57,7 +57,7 @@ namespace AutomatonBuilder.Entities.Contexts
 
         }
 
-        private void LoadNodes(AutomatonContext context, MainWindow host)
+        private void LoadNodes(AutomatonContext context, MainEditingScreen host)
         {
             foreach (var node in this.Nodes)
             {
@@ -77,7 +77,7 @@ namespace AutomatonBuilder.Entities.Contexts
             NodeUtils.SetNodesContextMenuOptions(context, host);
         }
 
-        private void LoadConnections(AutomatonContext context, MainWindow host)
+        private void LoadConnections(AutomatonContext context, MainEditingScreen host)
         {
             foreach (var node in this.Nodes)
             {
@@ -95,11 +95,11 @@ namespace AutomatonBuilder.Entities.Contexts
             }
         }
 
-        private void LoadBorderedTexts(AutomatonContext context, MainWindow host)
+        private void LoadBorderedTexts(AutomatonContext context, MainEditingScreen host)
         {
             foreach (var textBlock in this.TextBlocks)
             {
-                BorderedText borderedText = new(textBlock.Text);
+                BorderedText borderedText = new(textBlock.Properties);
                 context.BorderedTextsList.Add(borderedText);
 
                 TextUtils.AddContextMenuToText(borderedText, host);

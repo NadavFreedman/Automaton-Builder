@@ -44,7 +44,7 @@ namespace AutomatonBuilder.Utils
         #endregion
 
         #region CreateAddRemoveNodeActions
-        public static ModelNode CreateAndAddNode(AutomatonContext context, MainWindow host)
+        public static ModelNode CreateAndAddNode(AutomatonContext context, MainEditingScreen host)
         {
             //Create the new node
             ModelNode node = new(context.NodesList.Count, host, context.MouseProperies.LastRightClickPosition);
@@ -64,7 +64,7 @@ namespace AutomatonBuilder.Utils
             return node;
         }
 
-        public static void AddNodeToCanvas(AutomatonContext context, ModelNode nodeToAdd ,MainWindow host)
+        public static void AddNodeToCanvas(AutomatonContext context, ModelNode nodeToAdd ,MainEditingScreen host)
         {
             nodeToAdd.Index = context.NodesList.Count;
 
@@ -91,7 +91,7 @@ namespace AutomatonBuilder.Utils
             NodeUtils.SetNodesContextMenuOptions(context, host);
         }
 
-        public static void RemoveNode(AutomatonContext context, ModelNode nodeToRemove, MainWindow host)
+        public static void RemoveNode(AutomatonContext context, ModelNode nodeToRemove, MainEditingScreen host)
         {
             //Decrease the index of each node that was created after the current node.
             foreach (ModelNode node in context.NodesList)
@@ -130,7 +130,7 @@ namespace AutomatonBuilder.Utils
         #endregion
 
         #region Misc
-        public static void SetNodesContextMenuOptions(AutomatonContext context, MainWindow host)
+        public static void SetNodesContextMenuOptions(AutomatonContext context, MainEditingScreen host)
         {
             foreach (ModelNode changedNode in context.NodesList)
             {

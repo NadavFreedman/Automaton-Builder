@@ -17,7 +17,7 @@ namespace AutomatonBuilder.Utils
 {
     public class SavingUtils
     {
-        public static void SaveAsPng(MainWindow host, string filePath)
+        public static void SaveAsPng(MainEditingScreen host, string filePath)
         {
             host.MainToolBar.Visibility = Visibility.Hidden;
 
@@ -30,24 +30,28 @@ namespace AutomatonBuilder.Utils
             png.Save(stream);
             System.Drawing.Image image = System.Drawing.Image.FromStream(stream);
             image.Save(filePath, ImageFormat.Png);
+            //host.Title = filePath.Split('\\')[^1].Split('.')[0];
+
             MessageBox.Show("The model has been saved as an image successfully.", "Saved successfully", MessageBoxButton.OK, MessageBoxImage.Information);
 
             host.MainToolBar.Visibility = Visibility.Visible;
         }
 
-        public static void SaveAsAut(MainWindow mainWindow, string filePath)
+        public static void SaveAsEaf(MainEditingScreen mainWindow, string filePath)
         {
             JsonContext contextToSave = new JsonContext(mainWindow.context);
 
             File.WriteAllText(filePath, JsonConvert.SerializeObject(contextToSave));
+            //mainWindow.Title = filePath.Split('\\')[^1].Split('.')[0];
             MessageBox.Show("The model has been saved successfully.", "Saved successfully", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        public static AutomatonContext LoadContextFromFile(MainWindow mainWindow, string filePath)
+        public static AutomatonContext LoadContextFromFile(MainEditingScreen mainWindow, string filePath)
         {
             string jsonString = File.ReadAllText(filePath);
 
             JsonContext savedContext = JsonConvert.DeserializeObject<JsonContext>(jsonString);
+            //mainWindow.Title = filePath.Split('\\')[^1].Split('.')[0];
 
             return savedContext.ToContext(mainWindow.MainCanvas, mainWindow);
         }

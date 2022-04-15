@@ -67,7 +67,7 @@ namespace AutomatonBuilder.Entities.Connectors
         }
 
 
-        public void BindConnectorToMainWindow(MainWindow mainWindow)
+        public void BindConnectorToMainWindow(MainEditingScreen mainWindow)
         {
             ConnectorUtils.AddContextMenuToConnectorLine(this.ellipse, mainWindow, this);
             ConnectorUtils.AddContextMenuToConnectorText(this.text, mainWindow, this);

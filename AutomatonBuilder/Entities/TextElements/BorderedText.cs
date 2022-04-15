@@ -1,4 +1,5 @@
-﻿using AutomatonBuilder.Entities.Enums;
+﻿using AutomatonBuilder.Entities.Args;
+using AutomatonBuilder.Entities.Enums;
 using AutomatonBuilder.Interfaces;
 using AutomatonBuilder.Utils;
 using System;
@@ -15,22 +16,30 @@ namespace AutomatonBuilder.Entities.TextElements
     public class BorderedText: IMoveable
     {
         public Border Border { get; private set; }
-        private readonly TextBlock block;
+        public TextBlock Block { get; }
         private FormattedText formattedText;
         private Point position;
 
         public BorderedText(string text)
         {
             this.Border = TextUtils.CreateBorderWithTextBlock(text);
-            this.block = (TextBlock)this.Border.Tag;
-            this.formattedText = TextUtils.CreateFormattedText(this.block);
-            this.block.Tag = this;
+            this.Block = (TextBlock)this.Border.Tag;
+            this.formattedText = TextUtils.CreateFormattedText(this.Block);
+            this.Block.Tag = this;
         }
 
-        public void AllowDragging(MainWindow mainWindow)
+        public BorderedText(AddTextArgs args)
         {
-            block.MouseEnter += mainWindow.TaggedElement_MouseEnter;
-            block.MouseLeave += mainWindow.Element_MouseLeave;
+            this.Border = TextUtils.CreateBorderWithTextBlock(args);
+            this.Block = (TextBlock)this.Border.Tag;
+            this.formattedText = TextUtils.CreateFormattedText(this.Block);
+            this.Block.Tag = this;
+        }
+
+        public void AllowDragging(MainEditingScreen mainWindow)
+        {
+            Block.MouseEnter += mainWindow.TaggedElement_MouseEnter;
+            Block.MouseLeave += mainWindow.Element_MouseLeave;
         }
 
         public void SetPosition(Point newPosition)
@@ -42,13 +51,13 @@ namespace AutomatonBuilder.Entities.TextElements
 
         public void SetText(string text)
         {
-            this.block.Text = text;
-            this.formattedText = TextUtils.CreateFormattedText(this.block);
+            this.Block.Text = text;
+            this.formattedText = TextUtils.CreateFormattedText(this.Block);
         }
 
         public string GetText()
         {
-            return this.block.Text;
+            return this.Block.Text;
         }
 
         public void AddToCanvas(Canvas mainCanvas, ZAxis z = ZAxis.Top)
@@ -66,7 +75,7 @@ namespace AutomatonBuilder.Entities.TextElements
 
         internal void AttachContextMenu(ContextMenu menu)
         {
-            this.block.ContextMenu = menu;
+            this.Block.ContextMenu = menu;
         }
 
         public Point GetPosition()

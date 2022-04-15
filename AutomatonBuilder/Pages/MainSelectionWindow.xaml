@@ -1,0 +1,49 @@
+﻿<Page x:Class="AutomatonBuilder.Pages.MainSelectionWindow"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:AutomatonBuilder.Pages"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Name="MainGrid" Background="White">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="0.4*"/>
+            <ColumnDefinition Width="0.1*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="0.1*"/>
+            <ColumnDefinition Width="0.4*"/>
+            <ColumnDefinition Width="10"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="0.2*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="0.2*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="0.2*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="0.2*"/>
+            <RowDefinition Height="10"/>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="1" Grid.Column="3" Text="Automaton Builder" FontSize="30" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="DemiBold"/>
+        <Button x:Name="OpenProjectBtn" Grid.Row="2" Grid.Column="1" Margin="5, 10" Click="OpenProjectBtn_Click" MouseEnter="Button_MouseHover" MouseLeave="Button_MouseLeave">
+            <TextBlock Text="Open Project" TextWrapping="Wrap" TextAlignment="Center"/>
+        </Button>
+        <Button x:Name="NewBasicBtn" Grid.Row="4" Grid.Column="1" Margin="5, 10" Click="NewBasicBtn_Click" MouseEnter="Button_MouseHover" MouseLeave="Button_MouseLeave">
+            <TextBlock Text="New Automaton" TextWrapping="Wrap" TextAlignment="Center"/>
+        </Button>
+        <Button x:Name="NewPushdownBtn" Grid.Row="6" Grid.Column="1" Margin="5, 10" Click="NewPushdownBtn_Click" MouseEnter="Button_MouseHover" MouseLeave="Button_MouseLeave">
+            <TextBlock Text="New Pushdown Automaton" TextWrapping="Wrap" TextAlignment="Center"/>
+        </Button>
+        <Button x:Name="NewTuringBtn" Grid.Row="8" Grid.Column="1" Margin="5, 10" Click="NewTuringBtn_Click" MouseEnter="Button_MouseHover" MouseLeave="Button_MouseLeave">
+            <TextBlock Text="New Turing Machine" TextWrapping="Wrap" TextAlignment="Center"/>
+        </Button>
+        <Canvas x:Name="PreviewCanvas" Grid.Row="2" Grid.Column="3" Grid.RowSpan="7" Grid.ColumnSpan="3">
+            
+        </Canvas>
+    </Grid>
+</Page>

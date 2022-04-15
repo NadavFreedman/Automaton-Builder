@@ -4,26 +4,27 @@ using AutomatonBuilder.Interfaces;
 using System.Windows.Controls;
 using AutomatonBuilder.Entities.TextElements;
 using AutomatonBuilder.Entities.Contexts;
+using AutomatonBuilder.Entities.Args;
 
 namespace AutomatonBuilder.Actions.TextActions
 {
     public class AddTextAction : IAction
     {
         private readonly AutomatonContext context;
-        private readonly string text;
-        private readonly MainWindow host;
+        private readonly AddTextArgs args;
+        private readonly MainEditingScreen host;
         private BorderedText? borderedText;
 
-        public AddTextAction(AutomatonContext context, string text, MainWindow host)
+        public AddTextAction(AutomatonContext context, AddTextArgs args, MainEditingScreen host)
         {
             this.context = context;
-            this.text = text;
+            this.args = args;
             this.host = host;
         }
         public void DoAction()
         {
             //Create a text block
-            this.borderedText = new(this.text);
+            this.borderedText = new(this.args);
             this.context.BorderedTextsList.Add(this.borderedText);
 
 

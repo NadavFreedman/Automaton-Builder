@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using AutomatonBuilder.Entities.Args;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,20 +11,23 @@ namespace AutomatonBuilder.Entities.TextElements
 {
     public class BorderedTextBrief
     {
-        [JsonProperty("text")]
-        public string Text { get; set; }
+        [JsonProperty("properties")]
+        public AddTextArgs Properties { get; set; }
 
         [JsonProperty("position")]
         public Point Position { get; set; }
 
-        [JsonProperty("font_size")]
-        public double FontSize { get; set; }
-
         public BorderedTextBrief(BorderedText borderedText)
         {
-            this.Text = borderedText.GetText();
+            this.Properties = new AddTextArgs
+            {
+                Text = borderedText.Block.Text,
+                FontSize = borderedText.Block.FontSize,
+                Alignment = borderedText.Block.TextAlignment,
+                Color = borderedText.Block.Foreground,
+                Style = borderedText.Block.FontWeight
+            };
             this.Position = borderedText.GetPosition();
-            this.FontSize = 12;
         }
         public BorderedTextBrief() {}
     }

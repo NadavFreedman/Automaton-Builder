@@ -8,26 +8,29 @@ using System.Windows.Shapes;
 using System.Windows.Media;
 using AutomatonBuilder.Entities;
 using AutomatonBuilder.Entities.Contexts;
+using System.Windows.Controls;
 
 namespace AutomatonBuilder.Actions.DrawingActions
 {
     public class DrawLineAction : IAction
     {
         private readonly Polyline drawnLine;
+        private readonly MainEditingScreen host;
         private readonly AutomatonContext context;
 
-        public DrawLineAction(AutomatonContext context)
+        public DrawLineAction(AutomatonContext context, MainEditingScreen host)
         {
             this.context = context;
             this.drawnLine = context.CurrentLine!;
+            this.host = host;
         }
         public void DoAction()
         {
             this.context.DrawnLinesList.Add(this.drawnLine);
             this.context.CurrentLine = new Polyline
             {
-                Stroke = Brushes.Black,
-                StrokeThickness = 2.5,
+                Stroke = new SolidColorBrush(host.ColorPicker.SelectedColor!.GetValueOrDefault()),
+                StrokeThickness = double.Parse(((ComboBoxItem)host.FontSizeComboBox.SelectedValue).Content.ToString()!),
                 Points = new PointCollection()
             };
             this.context.MainCanvas.Children.Add(this.context.CurrentLine);

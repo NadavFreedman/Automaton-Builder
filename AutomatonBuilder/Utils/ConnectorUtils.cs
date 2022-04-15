@@ -13,11 +13,11 @@ namespace AutomatonBuilder.Utils
 {
     public class ConnectorUtils
     {
-        public static IConnector ConnectNodes(AutomatonContext context, ModelNode source, ModelNode destination, string connectorData, MainWindow host)
+        public static IConnector ConnectNodes(AutomatonContext context, ModelNode source, ModelNode destination, string connectorData, MainEditingScreen host)
         {
             if (source == destination)
-                return ConnectNodeToSelf(context, source, connectorData, host);
-            return ConnectNodeToAnotherNode(context, source, destination, connectorData, host);
+                return ConnectNodeToSelf(context.MainCanvas, source, connectorData, host);
+            return ConnectNodeToAnotherNode(context.MainCanvas, source, destination, connectorData, host);
         }
 
         public static List<ModelNode> DisconnectConnector(AutomatonContext context, IConnector connector)
@@ -36,34 +36,38 @@ namespace AutomatonBuilder.Utils
             return disconnectedNodes;
         }
 
-        private static IConnector ConnectNodeToAnotherNode(AutomatonContext context, ModelNode source, ModelNode destination, string connectorData, MainWindow host)
+        public static NodesConnector ConnectNodeToAnotherNode(Canvas canvas, ModelNode source, ModelNode destination, string connectorData, MainEditingScreen? host = null)
         {
             NodesConnector connector = new NodesConnector(connectorData, source.GetPosition(), destination.GetPosition());
 
             connector.SetTextPosition();
-            connector.AddToCanvasButtom(context.MainCanvas);
+            connector.AddToCanvasButtom(canvas);
 
-            connector.BindConnectorToMainWindow(host);
+            if (host is not null)
+                connector.BindConnectorToMainWindow(host);
+
             source.ConnectedLinesFromThisNode[connector] = destination;
             destination.ConnectedLinesToThisNode[connector] = source;
 
             return connector;
         }
 
-        private static IConnector ConnectNodeToSelf(AutomatonContext context, ModelNode node, string connectorData, MainWindow host)
+        public static SelfConnector ConnectNodeToSelf(Canvas canvas, ModelNode node, string connectorData, MainEditingScreen? host = null)
         {
             SelfConnector connector = new SelfConnector(connectorData, node.GetPosition());
             connector.SetTextPosition();
             connector.SetConnectorPosition();
-            connector.AddToCanvasButtom(context.MainCanvas);
-            connector.BindConnectorToMainWindow(host);
+            connector.AddToCanvasButtom(canvas);
+
+            if (host is not null)
+                connector.BindConnectorToMainWindow(host);
 
             node.ConnectedLinesFromThisNode[connector] = node;
 
             return connector;
         }
 
-        public static void AddContextMenuToConnectorLine(FrameworkElement connectorElement, MainWindow host, IConnector connector)
+        public static void AddContextMenuToConnectorLine(FrameworkElement connectorElement, MainEditingScreen host, IConnector connector)
         {
             MenuItem removeConnector = new MenuItem
             {
@@ -75,7 +79,7 @@ namespace AutomatonBuilder.Utils
             connectorElement.ContextMenu.Items.Add(removeConnector);
         }
 
-        public static void AddContextMenuToConnectorText(BorderedText borderedText, MainWindow host, IConnector connector)
+        public static void AddContextMenuToConnectorText(BorderedText borderedText, MainEditingScreen host, IConnector connector)
         {
             MenuItem removeConnector = new MenuItem
             {

@@ -44,7 +44,7 @@ namespace AutomatonBuilder.Entities.Contexts
 
         public Canvas MainCanvas;
 
-        public AutomatonContext(Canvas windowCanvas)
+        public AutomatonContext(Canvas windowCanvas, MainEditingScreen? host)
         {
             this.StartingNode = null;
             this.NodesList = new List<ModelNode>();
@@ -54,8 +54,8 @@ namespace AutomatonBuilder.Entities.Contexts
             this.DoneActionsStack = new Stack<IAction>();
             this.CurrentLine = new Polyline
             {
-                Stroke = Brushes.Black,
-                StrokeThickness = 2.5,
+                Stroke = new SolidColorBrush(host.ColorPicker.SelectedColor!.GetValueOrDefault()),
+                StrokeThickness = double.Parse(((ComboBoxItem)host.FontSizeComboBox.SelectedValue).Content.ToString()!),
                 Points = new PointCollection()
             };
             this.MainCanvas = windowCanvas;

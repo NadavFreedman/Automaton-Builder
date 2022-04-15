@@ -17,10 +17,10 @@ namespace AutomatonBuilder.Actions.NodeActions
         private readonly ModelNode sourse;
         private readonly ModelNode destination;
         private readonly string text;
-        private readonly MainWindow host;
+        private readonly MainEditingScreen host;
         private IConnector connector;
 
-        public ConnectNodesAction(AutomatonContext context, ModelNode source, ModelNode destination, string text, MainWindow host)
+        public ConnectNodesAction(AutomatonContext context, ModelNode source, ModelNode destination, string text, MainEditingScreen host)
         {
             this.context = context;
             this.sourse = source;

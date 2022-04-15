@@ -90,7 +90,7 @@ namespace AutomatonBuilder.Entities.Connectors
             canvas.Children.Insert(0, this.arrow);
         }
 
-        public void BindConnectorToMainWindow(MainWindow mainWindow)
+        public void BindConnectorToMainWindow(MainEditingScreen mainWindow)
         {
             this.arrow.Tag = this;
             this.text.Border.Tag = this;

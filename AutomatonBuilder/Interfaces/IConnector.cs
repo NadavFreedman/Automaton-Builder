@@ -21,6 +21,6 @@ namespace AutomatonBuilder.Interfaces
 
         public void RemoveFromCanvas(Canvas canvas);
 
-        public void BindConnectorToMainWindow(MainWindow mainWindow);
+        public void BindConnectorToMainWindow(MainEditingScreen mainWindow);
     }
 }

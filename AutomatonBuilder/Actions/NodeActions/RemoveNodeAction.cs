@@ -16,10 +16,10 @@ namespace AutomatonBuilder.Actions.NodeActions
     public class RemoveNodeAction: IAction
     {
         private readonly AutomatonContext context;
-        private readonly MainWindow host;
+        private readonly MainEditingScreen host;
         private readonly ModelNode node;
 
-        public RemoveNodeAction(AutomatonContext context, MainWindow host, ModelNode node)
+        public RemoveNodeAction(AutomatonContext context, MainEditingScreen host, ModelNode node)
         {
             this.context = context;
             this.host = host;

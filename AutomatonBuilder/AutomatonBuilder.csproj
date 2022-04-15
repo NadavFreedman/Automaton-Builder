@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Icons\AlignCenterIcon.png" />
+    <None Remove="Icons\AlignLeftIcon.png" />
+    <None Remove="Icons\AlignRightIcon.png" />
+    <None Remove="Icons\BoldIcon.png" />
     <None Remove="Icons\folder.png" />
     <None Remove="Icons\RedoIcon.png" />
     <None Remove="Icons\SaveIcon.png" />
@@ -16,15 +20,27 @@
 
   <ItemGroup>
     <Folder Include="Entities\Graphics\Arrows\" />
-    <Folder Include="Modals\" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Extended.Wpf.Toolkit" Version="4.3.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Icons\AlignCenterIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\AlignLeftIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\AlignRightIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\BoldIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Icons\folder.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
