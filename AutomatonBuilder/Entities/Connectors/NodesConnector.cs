@@ -19,7 +19,7 @@ namespace AutomatonBuilder.Entities.Connectors
             get { return this.arrow.Points[1]; } 
         }
 
-        const int NODE_SIZE = 80;
+        const int NODE_SIZE = 70;
 
         private BorderedText text;
         private ArrowPolyline arrow;

@@ -136,6 +136,8 @@ namespace AutomatonBuilder
                             this.context.MouseProperies.LeftClickHoldReleasePosition);
                         DoAction(moveTextAction);
                     }
+
+                    this.context.MouseProperies.HoveredElement = null;
                 }
             }
 

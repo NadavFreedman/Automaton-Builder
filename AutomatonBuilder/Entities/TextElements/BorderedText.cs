@@ -82,5 +82,10 @@ namespace AutomatonBuilder.Entities.TextElements
         {
             return this.position;
         }
+
+        public double Width { get { return this.formattedText.Width + this.Border.BorderThickness.Right + this.Border.BorderThickness.Left; } }
+
+        public double Height { get { return this.formattedText.Height + this.Border.BorderThickness.Top + this.Border.BorderThickness.Bottom; } }
+
     }
 }

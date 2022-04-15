@@ -102,24 +102,39 @@ namespace AutomatonBuilder.Utils
             previewText.FontSize = 18;
             basicPreviewCanvas.Children.Add(previewText);
 
-            ModelNode previewStartingNode = new ModelNode(0, null, new Point(100, 180));
+            ModelNode previewStartingNode = new ModelNode(0, null, new Point(50, 180));
             basicPreviewCanvas.Children.Add(previewStartingNode.StartingArrow);
             basicPreviewCanvas.Children.Add(previewStartingNode);
 
-            ModelNode previewStarted0Node = new ModelNode(1, null, new Point(250, 80));
+            ModelNode previewStarted0Node = new ModelNode(1, null, new Point(180, 100));
             basicPreviewCanvas.Children.Add(previewStarted0Node);
 
-            ModelNode previewStarted1Node = new ModelNode(2, null, new Point(250, 280));
+            ModelNode previewStarted1Node = new ModelNode(2, null, new Point(180, 260));
             basicPreviewCanvas.Children.Add(previewStarted1Node);
 
-            ModelNode previewAcceptingNode = new ModelNode(3, null, new Point(400, 180));
+            ModelNode last0Node = new ModelNode(3, null, new Point(370, 100));
+            basicPreviewCanvas.Children.Add(last0Node);
+
+            ModelNode last1Node = new ModelNode(4, null, new Point(370, 260));
+            basicPreviewCanvas.Children.Add(last1Node);
+
+            ModelNode previewAcceptingNode = new ModelNode(5, null, new Point(500, 180));
             previewAcceptingNode.AcceptingElipse.Visibility = Visibility.Visible;
             basicPreviewCanvas.Children.Add(previewAcceptingNode);
-            ConnectorUtils.ConnectNodeToAnotherNode(basicPreviewCanvas, previewStartingNode, previewStarted0Node, "0/0,🡆");
-            ConnectorUtils.ConnectNodeToAnotherNode(basicPreviewCanvas, previewStartingNode, previewStarted1Node, "1/1,🡆");
 
-            ConnectorUtils.ConnectNodeToAnotherNode(basicPreviewCanvas, previewStarted0Node, previewAcceptingNode, "0/0,🡆");
-            ConnectorUtils.ConnectNodeToAnotherNode(basicPreviewCanvas, previewStarted1Node, previewAcceptingNode, "1/1,🡆");
+            var long0Connector = ConnectorUtils.ConnectNodeToAnotherNode(basicPreviewCanvas, previewStartingNode, previewStarted0Node, "0/0,🡆");
+            long0Connector.SetPosition(new Point(50, 100));
+            var long1Connector = ConnectorUtils.ConnectNodeToAnotherNode(basicPreviewCanvas, previewStartingNode, previewStarted1Node, "1/1,🡆");
+            long1Connector.SetPosition(new Point(50, 260));
+
+            ConnectorUtils.ConnectNodeToAnotherNode(basicPreviewCanvas, previewStarted0Node, last0Node, "△/△,🡄");
+            ConnectorUtils.ConnectNodeToAnotherNode(basicPreviewCanvas, previewStarted1Node, last1Node, "△/△,🡄");
+
+            ConnectorUtils.ConnectNodeToSelf(basicPreviewCanvas, previewStarted0Node, "1/1,🡆\n0/0,🡆");
+            ConnectorUtils.ConnectNodeToSelf(basicPreviewCanvas, previewStarted1Node, "1/1,🡆\n0/0,🡆");
+
+            ConnectorUtils.ConnectNodeToAnotherNode(basicPreviewCanvas, last0Node, previewAcceptingNode, "0/0,🡆");
+            ConnectorUtils.ConnectNodeToAnotherNode(basicPreviewCanvas, last1Node, previewAcceptingNode, "1/1,🡆");
 
             return basicPreviewCanvas;
         }

@@ -55,8 +55,6 @@ namespace AutomatonBuilder.Utils
         public static SelfConnector ConnectNodeToSelf(Canvas canvas, ModelNode node, string connectorData, MainEditingScreen? host = null)
         {
             SelfConnector connector = new SelfConnector(connectorData, node.GetPosition());
-            connector.SetTextPosition();
-            connector.SetConnectorPosition();
             connector.AddToCanvasButtom(canvas);
 
             if (host is not null)

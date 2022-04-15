@@ -9,7 +9,7 @@
             Focusable="True" Loaded="MainCanvas_Loaded" FocusVisualStyle="{DynamicResource MyFocusVisual}">
         <ToolBar x:Name="MainToolBar">
             <Button x:Name="BackBtn" Click="BackBtn_Click" ToolTip="Go back to menu">
-                <Image Source="\Icons\Folder.png" Width="20">
+                <Image Source="\Icons\BackArrowIcon.png" Width="20">
                     <Image.Style>
                         <Style TargetType="Image">
                             <Style.Triggers>
