@@ -1,4 +1,5 @@
-﻿using AutomatonBuilder.Entities.Graphics;
+﻿using AutomatonBuilder.Entities.Enums;
+using AutomatonBuilder.Entities.Graphics;
 using AutomatonBuilder.Entities.Nodes;
 using AutomatonBuilder.Entities.TextElements;
 using AutomatonBuilder.Interfaces;
@@ -12,6 +13,9 @@ namespace AutomatonBuilder.Entities.Contexts
 {
     public class JsonContext
     {
+        [JsonProperty("automaton_type")]
+        public AutomatonTypes type { get; set; }
+
         [JsonProperty("nodes")]
         public List<NodeBrief> Nodes { get; set; }
 
@@ -27,6 +31,7 @@ namespace AutomatonBuilder.Entities.Contexts
             this.Nodes = new List<NodeBrief>();
             this.TextBlocks = new List<BorderedTextBrief>();
             this.Lines = new List<PolylineBrief>();
+            this.type = context.type;
 
             foreach (var node in context.NodesList)
             {
@@ -46,7 +51,7 @@ namespace AutomatonBuilder.Entities.Contexts
 
         public AutomatonContext ToContext(Canvas mainCanvas, MainEditingScreen host)
         {
-            AutomatonContext context = new AutomatonContext(mainCanvas, host);
+            AutomatonContext context = new AutomatonContext(mainCanvas, host, this.type);
 
             LoadNodes(context, host);
             LoadConnections(context, host);
@@ -67,6 +72,7 @@ namespace AutomatonBuilder.Entities.Contexts
                     newNode.AcceptingClick(null, null);
 
                 newNode.SetPosition(node.Position);
+                newNode.Starting = node.Starting;
 
                 newNode.MouseEnter += host.GeneralElement_MouseEnter;
                 newNode.MouseLeave += host.Element_MouseLeave;

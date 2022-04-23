@@ -16,17 +16,17 @@ namespace AutomatonBuilder.Entities.Connectors
 {
     public class SelfConnector : IConnector, IMoveable
     {
-        public string ConnectorData { get; private set; }
+        public IConnectorData ConnectorData { get; private set; }
 
         private Ellipse ellipse;
         private Point nodeCenter;
         private Point connectorCenter;
         private BorderedText borderedText;
 
-        public SelfConnector(string text, Point nodeCenter)
+        public SelfConnector(IConnectorData data, Point nodeCenter)
         {
-            InitBorder(text);
-            ChangeConnectorData(text);
+            InitBorder(data.ToString());
+            ChangeConnectorData(data);
             this.nodeCenter = nodeCenter;
             this.ellipse = new Ellipse
             {
@@ -49,10 +49,10 @@ namespace AutomatonBuilder.Entities.Connectors
             this.borderedText = new(text);
         }
 
-        public void ChangeConnectorData(string text)
+        public void ChangeConnectorData(IConnectorData data)
         {
-            this.ConnectorData = text;
-            this.borderedText.SetText(text);
+            this.ConnectorData = data;
+            this.borderedText.SetText(data.ToString());
         }
 
         public void AddToCanvasButtom(Canvas canvas)
@@ -109,6 +109,7 @@ namespace AutomatonBuilder.Entities.Connectors
         {
             const double NODE_SIZE = 70;
             const double SMALL_CIRCLE_SIZE = 50;
+
             var alpha = ConnectorUtils.GetAlpha(this.nodeCenter, newPosition);
             var newPosOnCircle = new Point
             {

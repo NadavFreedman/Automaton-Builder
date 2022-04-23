@@ -3,6 +3,7 @@ using AutomatonBuilder.Entities.TextElements;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Media;
 
 namespace AutomatonBuilder.Utils
@@ -82,6 +83,15 @@ namespace AutomatonBuilder.Utils
             var menu = new ContextMenu();
             menu.Items.Add(removeConnector);
             borderedText.AttachContextMenu(menu);
+        }
+
+        public static Run CreateRunElement(string text, int fontSize, Brush color)
+        {
+            Run previous = new();
+            previous.Text = text;
+            previous.FontSize = fontSize;
+            previous.Foreground = color;
+            return previous;
         }
     }
 }

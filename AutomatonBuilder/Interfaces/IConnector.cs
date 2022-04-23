@@ -10,9 +10,9 @@ namespace AutomatonBuilder.Interfaces
 {
     public interface IConnector
     {
-        public string ConnectorData { get; }
+        public IConnectorData ConnectorData { get; }
 
-        public void ChangeConnectorData(string text);
+        public void ChangeConnectorData(IConnectorData data);
 
         public void SetConnectorStart(Point startingPoint);
         public void SetConnectorEnd(Point endPoint);

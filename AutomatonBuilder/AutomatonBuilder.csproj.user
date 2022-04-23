@@ -13,7 +13,16 @@
     <Compile Update="MainWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Modals\TextInputWindow.xaml.cs">
+    <Compile Update="Modals\ConnectionModals\PushdownConnectorModal.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Modals\ConnectionModals\TuringConnectorModal.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Modals\RunWordModal.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Modals\TextInputModal.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Pages\MainSelectionWindow.xaml.cs">
@@ -24,13 +33,22 @@
     <Page Update="Entities\Nodes\ModelNode.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="Modals\ConnectionModals\PushdownConnectorModal.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Modals\ConnectionModals\TuringConnectorModal.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Modals\RunWordModal.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Pages\MainEditingWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MainWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Modals\TextInputWindow.xaml">
+    <Page Update="Modals\TextInputModal.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Pages\MainSelectionWindow.xaml">

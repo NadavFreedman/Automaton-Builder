@@ -18,10 +18,10 @@ namespace AutomatonBuilder.Modals
     /// <summary>
     /// Interaction logic for TextInputWindow.xaml
     /// </summary>
-    public partial class TextInputWindow : Window
+    public partial class TextInputModal : Window
     {
         public AddTextArgs Input { get; set; }
-        public TextInputWindow()
+        public TextInputModal()
         {
             InitializeComponent();
             this.InputBox.Focus();

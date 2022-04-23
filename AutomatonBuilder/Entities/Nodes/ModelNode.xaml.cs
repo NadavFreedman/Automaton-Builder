@@ -129,5 +129,10 @@ namespace AutomatonBuilder.Entities
             NodeUtils.ToggleNodeStarting(this.root.context, this);
         }
 
+        public void SetColor(Brush color)
+        {
+            this.NodeBody.Fill = color;
+        }
+
     }
 }

@@ -2,7 +2,7 @@
 using AutomatonBuilder.Actions.TextActions;
 using AutomatonBuilder.Entities;
 using AutomatonBuilder.Interfaces;
-using AutomatonBuilder.Modals;
+using AutomatonBuilder.Modals.ConnectionModals;
 using Microsoft.Win32;
 using System;
 using System.Windows;
@@ -16,6 +16,10 @@ using AutomatonBuilder.Actions.DrawingActions;
 using AutomatonBuilder.Utils;
 using AutomatonBuilder.Entities.Contexts;
 using AutomatonBuilder.Entities.Args;
+using AutomatonBuilder.Entities.Enums;
+using AutomatonBuilder.Modals;
+using AutomatonBuilder.Entities.AutomatonMemories;
+using System.Threading.Tasks;
 
 namespace AutomatonBuilder
 {
@@ -28,10 +32,10 @@ namespace AutomatonBuilder
         public AutomatonContext context;
         private readonly MainWindow host;
 
-        public MainEditingScreen(MainWindow host)
+        public MainEditingScreen(MainWindow host, AutomatonTypes type = AutomatonTypes.Basic)
         {
             InitializeComponent();
-            this.context = new AutomatonContext(this.MainCanvas, this);
+            this.context = new AutomatonContext(this.MainCanvas, this, type);
             this.host = host;
         }
 
@@ -52,11 +56,11 @@ namespace AutomatonBuilder
             ModelNode connectFrom = (ModelNode)((MenuItem)sender).Tag;
             ModelNode connectTo = ConnectorUtils.GetNodeByName(this.context, ((MenuItem)sender).Header.ToString()!);
 
-            ConnectorInput connectorInputWindow = new(connectFrom.ToString(), connectTo.ToString());
+            IConnectionModal connectorInputWindow = ConnectorUtils.CreateConnectionModal(this.context.type, connectFrom.ToString(), connectTo.ToString());
             connectorInputWindow.ShowDialog();
-            string input;
+            IConnectorData input;
             if (connectorInputWindow.DialogResult == true)
-                input = connectorInputWindow.Input;
+                input = connectorInputWindow.ConnectorData!;
             else
                 return;
 
@@ -203,7 +207,7 @@ namespace AutomatonBuilder
         private void AddTextMenuItem_Click(object sender, RoutedEventArgs e)
         {
             //Open an input dialog
-            TextInputWindow textInputWindow = new();
+            TextInputModal textInputWindow = new();
             textInputWindow.ShowDialog();
             AddTextArgs input;
             if (textInputWindow.DialogResult == true)
@@ -313,6 +317,18 @@ namespace AutomatonBuilder
         private void BackBtn_Click(object sender, RoutedEventArgs e)
         {
             this.host.GoToMenu();
+        }
+
+        private async void PlayBtn_ClickAsync(object sender, RoutedEventArgs e)
+        {
+            RunWordModal wordModal = new();
+            if (wordModal.ShowDialog() == false) return;
+
+            bool result = await RunningUtils.Run(this.context.StartingNode!, RunningUtils.CreateMemory(this.context.type, wordModal.EnteredWord), this.MemoryCanvas);
+            if (result)
+                MessageBox.Show($"The word was accepted!");
+            else
+                MessageBox.Show($"The word wasn't accepted!");
         }
     }
 }

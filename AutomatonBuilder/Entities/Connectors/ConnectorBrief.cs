@@ -12,7 +12,7 @@ namespace AutomatonBuilder.Entities.Connectors
     public class ConnectorBrief
     {
         [JsonProperty("connector_data")]
-        public string ConnectorData { get; set; }
+        public IConnectorData ConnectorData { get; set; }
 
         [JsonProperty("position")]
         public Point Position { get; set; }

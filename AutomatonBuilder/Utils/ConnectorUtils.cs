@@ -1,8 +1,10 @@
 ﻿using AutomatonBuilder.Entities;
 using AutomatonBuilder.Entities.Connectors;
 using AutomatonBuilder.Entities.Contexts;
+using AutomatonBuilder.Entities.Enums;
 using AutomatonBuilder.Entities.TextElements;
 using AutomatonBuilder.Interfaces;
+using AutomatonBuilder.Modals.ConnectionModals;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -13,7 +15,7 @@ namespace AutomatonBuilder.Utils
 {
     public class ConnectorUtils
     {
-        public static IConnector ConnectNodes(AutomatonContext context, ModelNode source, ModelNode destination, string connectorData, MainEditingScreen host)
+        public static IConnector ConnectNodes(AutomatonContext context, ModelNode source, ModelNode destination, IConnectorData connectorData, MainEditingScreen host)
         {
             if (source == destination)
                 return ConnectNodeToSelf(context.MainCanvas, source, connectorData, host);
@@ -36,7 +38,7 @@ namespace AutomatonBuilder.Utils
             return disconnectedNodes;
         }
 
-        public static NodesConnector ConnectNodeToAnotherNode(Canvas canvas, ModelNode source, ModelNode destination, string connectorData, MainEditingScreen? host = null)
+        public static NodesConnector ConnectNodeToAnotherNode(Canvas canvas, ModelNode source, ModelNode destination, IConnectorData connectorData, MainEditingScreen? host = null)
         {
             NodesConnector connector = new NodesConnector(connectorData, source.GetPosition(), destination.GetPosition());
 
@@ -52,7 +54,7 @@ namespace AutomatonBuilder.Utils
             return connector;
         }
 
-        public static SelfConnector ConnectNodeToSelf(Canvas canvas, ModelNode node, string connectorData, MainEditingScreen? host = null)
+        public static SelfConnector ConnectNodeToSelf(Canvas canvas, ModelNode node, IConnectorData connectorData, MainEditingScreen? host = null)
         {
             SelfConnector connector = new SelfConnector(connectorData, node.GetPosition());
             connector.AddToCanvasButtom(canvas);
@@ -113,9 +115,36 @@ namespace AutomatonBuilder.Utils
             double deltaX = a.X - b.X;
             double deltaY = a.Y - b.Y;
             double alpha = Math.Atan(deltaY / deltaX);
-            if (deltaX < 0 && deltaY < 0 || deltaY > 0 && deltaX < 0)
+            if (deltaX < 0 && deltaY <= 0 || deltaY > 0 && deltaX < 0)
                 return alpha - Math.PI;
             return alpha;
+        }
+
+        public static Point CalculateArrowEndpoint(Point endPoint, double alpha, double node_size)
+        {
+            return new Point
+            {
+                X = endPoint.X - Math.Cos(alpha) * node_size * 0.55,
+                Y = endPoint.Y - Math.Sin(alpha) * node_size * 0.55
+            };
+        }
+
+        public static IConnectionModal CreateConnectionModal(AutomatonTypes type, string from, string to)
+        {
+            switch (type)
+            {
+                case AutomatonTypes.Basic:
+                    return new BasicConnectorModal(from, to);
+
+                case AutomatonTypes.Pushdown:
+                    return new PushdownConnectorModal(from, to);
+
+                case AutomatonTypes.Turing:
+                    return new BasicConnectorModal(from, to);
+
+                default:
+                    throw new Exception("Unknown automaton type");
+            }
         }
 
     }

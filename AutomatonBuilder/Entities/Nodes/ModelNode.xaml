@@ -7,7 +7,7 @@
              mc:Ignorable="d">
     <Viewbox x:Name="MainViewBox" Width="50" Height="50" OpacityMask="Black">
         <Grid x:Name="MainGrid" Width="20" Height="20">
-            <Ellipse Stroke="Black" StrokeThickness="0.5" Fill="White"/>
+            <Ellipse x:Name="NodeBody" Stroke="Black" StrokeThickness="0.5" Fill="White"/>
             <Ellipse x:Name="AcceptingElipse" Stroke="Black" StrokeThickness="0.5" Visibility="Collapsed" Margin="1"/>
             <TextBlock TextAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="5">
                         <Run>q</Run>

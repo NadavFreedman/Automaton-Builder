@@ -3,8 +3,6 @@ using AutomatonBuilder.Entities.TextElements;
 using AutomatonBuilder.Interfaces;
 using AutomatonBuilder.Utils;
 using Petzold.Media2D;
-using System;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -13,7 +11,7 @@ namespace AutomatonBuilder.Entities.Connectors
 {
     public class NodesConnector: IConnector, IMoveable
     {
-        public string ConnectorData { get; private set; }
+        public IConnectorData ConnectorData { get; private set; }
         public Point ConnectorMiddlePoint 
         { 
             get { return this.arrow.Points[1]; } 
@@ -26,10 +24,10 @@ namespace AutomatonBuilder.Entities.Connectors
         private Point startingPoint;
         private Point endPoint;
 
-        public NodesConnector(string text, Point startingPoint, Point endPoint)
+        public NodesConnector(IConnectorData data, Point startingPoint, Point endPoint)
         {
-            InitBorder(text);
-            ChangeConnectorData(text);
+            InitBorder(data.ToString());
+            ChangeConnectorData(data);
             InitArrow(startingPoint, endPoint);
         }
 
@@ -70,18 +68,14 @@ namespace AutomatonBuilder.Entities.Connectors
                     Y = startingPoint.Y
                 },
                 middlePoint,
-                new Point
-                {
-                    X = endPoint.X - Math.Cos(alpha) * (NODE_SIZE / 2),
-                    Y = endPoint.Y - Math.Sin(alpha) * (NODE_SIZE / 2)
-                }
+                ConnectorUtils.CalculateArrowEndpoint(endPoint, alpha, NODE_SIZE)
             };
         }
 
-        public void ChangeConnectorData(string text)
+        public void ChangeConnectorData(IConnectorData data)
         {
-            this.ConnectorData = text;
-            this.text.SetText(text);
+            this.ConnectorData = data;
+            this.text.SetText(data.ToString());
         }
 
         public void AddToCanvasButtom(Canvas canvas)
@@ -113,19 +107,7 @@ namespace AutomatonBuilder.Entities.Connectors
         public void SetTextPosition()
         {
             int pointCount = this.arrow.Points.Count;
-            Point middlePoint;
-            if (pointCount % 2 != 0)
-            {
-                middlePoint = this.arrow.Points[pointCount / 2];
-            }
-            else
-            {
-                middlePoint = new Point()
-                {
-                    X = this.arrow.Points.Sum(p => p.X) / pointCount,
-                    Y = this.arrow.Points.Sum(p => p.Y) / pointCount
-                };
-            }
+            Point middlePoint = this.arrow.Points[1]; ;
             this.text.SetPosition(middlePoint);
         }
 
@@ -147,11 +129,7 @@ namespace AutomatonBuilder.Entities.Connectors
         {
             this.arrow.Points[1] = newPosition;
             double alpha = ConnectorUtils.GetAlpha(this.endPoint, newPosition);
-            this.arrow.Points[2] = new Point
-            {
-                X = endPoint.X - Math.Cos(alpha) * (NODE_SIZE / 2),
-                Y = endPoint.Y - Math.Sin(alpha) * (NODE_SIZE / 2)
-            };
+            this.arrow.Points[2] = ConnectorUtils.CalculateArrowEndpoint(this.endPoint, alpha, NODE_SIZE);
             this.SetTextPosition();
         }
 

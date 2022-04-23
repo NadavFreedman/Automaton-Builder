@@ -79,7 +79,24 @@
                 <ComboBoxItem>11</ComboBoxItem>
                 <ComboBoxItem>12</ComboBoxItem>
             </ComboBox>
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+            <Button x:Name="PlayBtn" Click="PlayBtn_ClickAsync" ToolTip="Run a word in the automaton">
+                <Image Source="\Icons\PlayIcon.png" Width="20">
+                    <Image.Style>
+                        <Style TargetType="Image">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.5" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Image.Style>
+                </Image>
+            </Button>
         </ToolBar>
+        <Canvas x:Name="MemoryCanvas" Canvas.Top="800" Width="2000" Height="200">
+            
+        </Canvas>
     </Canvas>
     <Page.Resources>
         <Style x:Key="ImageEnabled" TargetType="Image">

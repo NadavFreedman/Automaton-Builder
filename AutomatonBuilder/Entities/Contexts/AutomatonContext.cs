@@ -11,6 +11,7 @@ using Petzold.Media2D;
 using System.Windows.Media;
 using Newtonsoft.Json;
 using AutomatonBuilder.Entities.TextElements;
+using AutomatonBuilder.Entities.Enums;
 
 namespace AutomatonBuilder.Entities.Contexts
 {
@@ -44,7 +45,9 @@ namespace AutomatonBuilder.Entities.Contexts
 
         public Canvas MainCanvas;
 
-        public AutomatonContext(Canvas windowCanvas, MainEditingScreen? host)
+        public AutomatonTypes type;
+
+        public AutomatonContext(Canvas windowCanvas, MainEditingScreen? host, AutomatonTypes type)
         {
             this.StartingNode = null;
             this.NodesList = new List<ModelNode>();
@@ -67,7 +70,7 @@ namespace AutomatonBuilder.Entities.Contexts
                 HoveredElement = null,
             };
             this.StartingNode = null;
-            
+            this.type = type;
         }
 
     }

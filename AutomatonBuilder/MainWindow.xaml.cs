@@ -32,7 +32,7 @@ namespace AutomatonBuilder
         public void NewProject(AutomatonTypes selectedType)
         {
             this.WindowState = WindowState.Maximized;
-            this.Content = new MainEditingScreen(this);
+            this.Content = new MainEditingScreen(this, selectedType);
         }
 
         public void OpenProject(string filePath)

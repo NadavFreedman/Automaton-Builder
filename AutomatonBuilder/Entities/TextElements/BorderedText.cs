@@ -68,10 +68,12 @@ namespace AutomatonBuilder.Entities.TextElements
                 mainCanvas.Children.Insert(0, this.Border);
         }
 
+
         public void RemoveFromCanvas(Canvas mainCanvas)
         {
             mainCanvas.Children.Remove(this.Border);
         }
+
 
         internal void AttachContextMenu(ContextMenu menu)
         {

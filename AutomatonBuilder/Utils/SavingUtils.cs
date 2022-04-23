@@ -1,14 +1,7 @@
 ﻿using AutomatonBuilder.Entities.Contexts;
-using AutomatonBuilder.Entities.Nodes;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -41,8 +34,13 @@ namespace AutomatonBuilder.Utils
         {
             JsonContext contextToSave = new JsonContext(mainWindow.context);
 
-            File.WriteAllText(filePath, JsonConvert.SerializeObject(contextToSave));
-            //mainWindow.Title = filePath.Split('\\')[^1].Split('.')[0];
+            File.WriteAllText(filePath, JsonConvert.SerializeObject(contextToSave, new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                NullValueHandling = NullValueHandling.Ignore,
+                Formatting = Formatting.Indented
+            }));
+            mainWindow.Title = filePath.Split('\\')[^1].Split('.')[0];
             MessageBox.Show("The model has been saved successfully.", "Saved successfully", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
@@ -50,8 +48,12 @@ namespace AutomatonBuilder.Utils
         {
             string jsonString = File.ReadAllText(filePath);
 
-            JsonContext savedContext = JsonConvert.DeserializeObject<JsonContext>(jsonString);
-            //mainWindow.Title = filePath.Split('\\')[^1].Split('.')[0];
+            JsonContext savedContext = JsonConvert.DeserializeObject<JsonContext>(jsonString, new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                NullValueHandling = NullValueHandling.Ignore,
+            })!;
+            mainWindow.Title = filePath.Split('\\')[^1].Split('.')[0];
 
             return savedContext.ToContext(mainWindow.MainCanvas, mainWindow);
         }
