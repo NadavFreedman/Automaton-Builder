@@ -16,6 +16,7 @@ namespace AutomatonBuilder.Actions.NodeActions
         private readonly AutomatonContext context;
         private readonly MainEditingScreen host;
         private ModelNode? createdNode;
+        public bool CanceledAction { get; set; } = false;
 
         public AddNodeAction(AutomatonContext context, MainEditingScreen host)
         {

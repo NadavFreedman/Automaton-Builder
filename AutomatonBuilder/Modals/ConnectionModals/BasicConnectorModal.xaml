@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AutomatonBuilder.Modals"
         mc:Ignorable="d" Loaded="Window_Loaded"
-        Title="ConnectorInput" Height="400" Width="400" KeyDown="InputBox_KeyDown">
+        Title="Connect Nodes" Height="400" Width="400" KeyDown="InputBox_KeyDown">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="10"/>
@@ -34,7 +34,8 @@
 
         <TextBlock x:Name="InstructionsBlock" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="7" Grid.RowSpan="1" Text="INSTRUCTIONS" TextAlignment="Center" VerticalAlignment="Center" FontSize="20"/>
 
-        <TextBox x:Name="InputBox" Grid.Column="2" Grid.Row="5" Grid.ColumnSpan="2" Grid.RowSpan="1" FontSize="16" TextAlignment="Center" VerticalContentAlignment="Center" TextChanged="InputBox_TextChanged"/>
+        <TextBox x:Name="InputBox" Grid.Column="2" Grid.Row="5" Grid.ColumnSpan="2" Grid.RowSpan="1" FontSize="16" 
+                 TextAlignment="Center" VerticalContentAlignment="Center" TextChanged="InputBox_TextChanged"/>
 
         <TextBlock Grid.Column="5" Grid.Row="2" Grid.ColumnSpan="3" Grid.RowSpan="1" Text="Connections:" VerticalAlignment="Center" FontSize="16"/>
         <ScrollViewer Grid.Row="3" Grid.Column="5" Grid.ColumnSpan="3" Grid.RowSpan="5" VerticalScrollBarVisibility="Visible">
@@ -44,4 +45,15 @@
 
         <Button x:Name="AddBtn" Content="Done" Click="AddBtn_Click" Grid.Row="9" Grid.Column="3" Grid.ColumnSpan="3"/>
     </Grid>
+    <Window.Resources>
+        <Style TargetType="TextBox">
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="DodgerBlue"/>
+                    <Setter Property="BorderThickness" Value="3"/>
+                    <Setter Property="Background" Value="LightCyan"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
 </Window>

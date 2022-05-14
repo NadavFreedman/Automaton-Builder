@@ -62,16 +62,19 @@ namespace AutomatonBuilder.Pages
         private void NewBasicBtn_Click(object sender, RoutedEventArgs e)
         {
             this.host.NewProject(AutomatonTypes.Basic);
+            this.host.Title = "BasicAutomaton";
         }
 
         private void NewPushdownBtn_Click(object sender, RoutedEventArgs e)
         {
             this.host.NewProject(AutomatonTypes.Pushdown);
+            this.host.Title = "PushdownAutomaton";
         }
 
         private void NewTuringBtn_Click(object sender, RoutedEventArgs e)
         {
             this.host.NewProject(AutomatonTypes.Turing);
+            this.host.Title = "TuringAutomaton";
         }
 
         private void Button_MouseHover(object sender, MouseEventArgs e)

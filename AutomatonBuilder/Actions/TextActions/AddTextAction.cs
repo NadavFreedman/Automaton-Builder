@@ -14,6 +14,7 @@ namespace AutomatonBuilder.Actions.TextActions
         private readonly AddTextArgs args;
         private readonly MainEditingScreen host;
         private BorderedText? borderedText;
+        public bool CanceledAction { get; set; } = false;
 
         public AddTextAction(AutomatonContext context, AddTextArgs args, MainEditingScreen host)
         {

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AutomatonBuilder.Modals"
         mc:Ignorable="d"
-        Title="RunWordModal" Height="337.5" Width="600" Loaded="Window_Loaded" KeyDown="Window_KeyDown">
+        Title="Run Word..." Height="337.5" Width="600" Loaded="Window_Loaded" KeyDown="Window_KeyDown">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="10"/>
@@ -31,7 +31,20 @@
 
         <TextBlock Text="Enter a word to run through the automaton." Grid.Row="2" Grid.ColumnSpan="7" Grid.Column="1" FontSize="20"/>
 
-        <TextBox x:Name="InputBox" Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="5" FontSize="20" TextAlignment="Center"/>
+        <TextBox x:Name="InputBox" Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="3" FontSize="20" TextAlignment="Center" Padding="3"/>
+
+        <TextBlock Text="Delay [s]:" Grid.Row="4" Grid.ColumnSpan="1" Grid.Column="5" FontSize="20" VerticalAlignment="Center"/>
+
+        <ComboBox Name="DelayBox" Margin="10, 0" Grid.Column="6" Grid.Row="4" VerticalContentAlignment="Center" FontSize="20">
+            <ComboBoxItem>0.1</ComboBoxItem>
+            <ComboBoxItem IsSelected="True">0.5</ComboBoxItem>
+            <ComboBoxItem>1</ComboBoxItem>
+            <ComboBoxItem>1.5</ComboBoxItem>
+            <ComboBoxItem>2</ComboBoxItem>
+            <ComboBoxItem>3</ComboBoxItem>
+            <ComboBoxItem>4</ComboBoxItem>
+            <ComboBoxItem>5</ComboBoxItem>
+        </ComboBox>
 
         <Button x:Name="RunBtn" Grid.Row="6" Grid.Column="3" Grid.ColumnSpan="3" Content="Run Word" FontSize="16" Click="RunBtn_Click"/>
     </Grid>

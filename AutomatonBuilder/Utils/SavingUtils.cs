@@ -23,7 +23,6 @@ namespace AutomatonBuilder.Utils
             png.Save(stream);
             System.Drawing.Image image = System.Drawing.Image.FromStream(stream);
             image.Save(filePath, ImageFormat.Png);
-            //host.Title = filePath.Split('\\')[^1].Split('.')[0];
 
             MessageBox.Show("The model has been saved as an image successfully.", "Saved successfully", MessageBoxButton.OK, MessageBoxImage.Information);
 
@@ -40,7 +39,7 @@ namespace AutomatonBuilder.Utils
                 NullValueHandling = NullValueHandling.Ignore,
                 Formatting = Formatting.Indented
             }));
-            mainWindow.Title = filePath.Split('\\')[^1].Split('.')[0];
+            mainWindow.ChangeTitle(filePath.Split('\\')[^1].Split('.')[0]);
             MessageBox.Show("The model has been saved successfully.", "Saved successfully", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 

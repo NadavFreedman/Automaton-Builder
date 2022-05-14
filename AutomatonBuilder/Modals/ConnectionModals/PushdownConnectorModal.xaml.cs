@@ -34,6 +34,17 @@ namespace AutomatonBuilder.Modals.ConnectionModals
             InstructionsBlock.Text = string.Format("Connect Between {0} to {1}:", from, to);
         }
 
+        public PushdownConnectorModal(string from, string to, IConnectorData connectorData)
+        {
+            InitializeComponent();
+            InstructionsBlock.Text = string.Format("Connect Between {0} to {1}:", from, to);
+            PushdownAutomatonData pushdownData = (PushdownAutomatonData)connectorData;
+            singleDataList = new List<SinglePushdownData>();
+            var tempDataList = new List<SinglePushdownData>(pushdownData.Data);
+            foreach (var item in tempDataList)
+                InsertNewEntryToStack(item);
+        }
+
         private void WordValueBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (this.WordValueBox.Text.Length > 1)
@@ -124,6 +135,7 @@ namespace AutomatonBuilder.Modals.ConnectionModals
         {
             if (this.DoneBtn.IsEnabled)
             {
+                AddBtn_Click(null, null);
                 this.ConnectorData = new PushdownAutomatonData(singleDataList);
                 this.DialogResult = true;
             }
@@ -213,6 +225,26 @@ namespace AutomatonBuilder.Modals.ConnectionModals
         private void ToggleDoneBtn()
         {
             this.DoneBtn.IsEnabled = this.singleDataList.Count > 0;
+        }
+
+        private void WordValueBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            this.InfoBlock.Text = "Value: Insert the next letter needed to move to the connected node.";
+        }
+
+        private void TopValueBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            this.InfoBlock.Text = "Top: Insert the next value needed to be in the top of the stack in order to move to the connected node.\nSpecial Keys: \"_\" for \"⟂\" (Empty Stack)";
+        }
+
+        private void ActionStackBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            this.InfoBlock.Text = "Action: Insert the action that needs to be done if the connection is used.\nSpecial Keys: DownArrow for Push, UpArrow for Pop, Space for NoChange";
+        }
+
+        private void ActionStackValueBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            this.InfoBlock.Text = "Action Value: Insert the value associated with the action.\nIf the action is Pop the field is automaticialy filled with the Top value.";
         }
     }
 }

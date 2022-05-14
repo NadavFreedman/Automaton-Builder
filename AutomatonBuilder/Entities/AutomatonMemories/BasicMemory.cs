@@ -1,15 +1,7 @@
 ﻿using AutomatonBuilder.Entities.Graphics.Memories;
 using AutomatonBuilder.Interfaces;
-using AutomatonBuilder.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Media;
 
 namespace AutomatonBuilder.Entities.AutomatonMemories
 {
@@ -20,10 +12,18 @@ namespace AutomatonBuilder.Entities.AutomatonMemories
 
         private readonly GraphicalBasicMemory graphicalWord;
 
-        public BasicMemory(string word, int currentIndex = 0)
+        public BasicMemory(string word, GraphicalBasicMemory graphicalMemory)
         {
             this.word = word;
-            this.CurrentIndex = currentIndex;
+            this.CurrentIndex = 0;
+            this.graphicalWord = graphicalMemory;
+        }
+
+        public BasicMemory(BasicMemory origin)
+        {
+            this.word = origin.word;
+            this.CurrentIndex = origin.CurrentIndex;
+            this.graphicalWord = origin.graphicalWord;
         }
 
         public char GetCurrentValue()
@@ -38,7 +38,7 @@ namespace AutomatonBuilder.Entities.AutomatonMemories
 
         public IAutomatonMemory Clone()
         {
-            return new BasicMemory(word, this.CurrentIndex);
+            return new BasicMemory(this);
         }
 
         public bool IsDetermenistic()
@@ -51,11 +51,9 @@ namespace AutomatonBuilder.Entities.AutomatonMemories
             return true;
         }
 
-        public void PrintMemroy(Canvas memoryCanvas)
+        public void PrintMemroy()
         {
-            memoryCanvas.Children.Clear();
-            Border border = RunningUtils.CreateGraphicalBasicMemory(this.word, this.CurrentIndex);
-            memoryCanvas.Children.Add(border);
+            this.graphicalWord.ChangeWord(this.word, this.CurrentIndex);
         }
     }
 }

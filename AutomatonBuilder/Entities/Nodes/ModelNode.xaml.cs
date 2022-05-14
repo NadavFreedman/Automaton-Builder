@@ -37,8 +37,8 @@ namespace AutomatonBuilder.Entities
         private readonly MainEditingScreen root;
 
         private Point position;
-        public Dictionary<IConnector, ModelNode> ConnectedLinesToThisNode { get; set; }
-        public Dictionary<IConnector, ModelNode> ConnectedLinesFromThisNode { get; set; }
+        public Dictionary<ModelNode, IConnector> ConnectorsToThisNode { get; set; }
+        public Dictionary<ModelNode, IConnector> ConnectorsFromThisNode { get; set; }
 
 
         private int index;
@@ -60,8 +60,8 @@ namespace AutomatonBuilder.Entities
                 Stroke = Brushes.Black,
             };
 
-            this.ConnectedLinesToThisNode = new Dictionary<IConnector, ModelNode>();
-            this.ConnectedLinesFromThisNode = new Dictionary<IConnector, ModelNode>();
+            this.ConnectorsToThisNode = new Dictionary<ModelNode, IConnector>();
+            this.ConnectorsFromThisNode = new Dictionary<ModelNode, IConnector>();
 
             this.SetPosition(pos);
         }
@@ -94,11 +94,11 @@ namespace AutomatonBuilder.Entities
             Canvas.SetLeft(this, this.position.X - this.size / 2);
             Canvas.SetTop(this, this.position.Y - this.size / 2);
 
-            foreach(IConnector connector in this.ConnectedLinesToThisNode.Keys)
+            foreach(IConnector connector in this.ConnectorsToThisNode.Values)
             {
                 connector.SetConnectorEnd(newPosition);
             }
-            foreach (IConnector connector in this.ConnectedLinesFromThisNode.Keys)
+            foreach (IConnector connector in this.ConnectorsFromThisNode.Values)
             {
                 connector.SetConnectorStart(newPosition);
             }

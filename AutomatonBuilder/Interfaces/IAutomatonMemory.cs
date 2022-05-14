@@ -1,12 +1,11 @@
-﻿using System.Windows.Controls;
-
+﻿
 namespace AutomatonBuilder.Interfaces
 {
     public interface IAutomatonMemory
     {
         public IAutomatonMemory Clone();
 
-        public void PrintMemroy(Canvas memoryCanvas);
+        public void PrintMemroy();
 
         public bool IsLastCharacter();
 

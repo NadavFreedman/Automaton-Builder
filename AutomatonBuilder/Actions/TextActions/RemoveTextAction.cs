@@ -11,6 +11,7 @@ namespace AutomatonBuilder.Actions.TextActions
     {
         private readonly AutomatonContext context;
         private readonly BorderedText borderedText;
+        public bool CanceledAction { get; set; } = false;
 
         public RemoveTextAction(AutomatonContext context, BorderedText text)
         {

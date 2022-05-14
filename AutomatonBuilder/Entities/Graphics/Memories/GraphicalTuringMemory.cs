@@ -1,22 +1,25 @@
 ﻿using AutomatonBuilder.Interfaces;
 using AutomatonBuilder.Utils;
 using System;
-using System.Diagnostics;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
 namespace AutomatonBuilder.Entities.Graphics.Memories
 {
-    public class GraphicalBasicMemory: IMoveable
+    public class GraphicalTuringMemory: IMoveable
     {
         private Border graphicalMemory;
         private Point position;
         private Canvas? canvas;
         private MainEditingScreen? mainEditingScreen;
 
-        public GraphicalBasicMemory(string word, int currentIndex, Point position)
+        public GraphicalTuringMemory(LinkedList<char> memory, int currentIndex, Point position)
         {
-            this.graphicalMemory = RunningUtils.CreateGraphicalBasicMemory(word, currentIndex);
+            this.graphicalMemory = RunningUtils.CreateGraphicalTuringMemory(memory, currentIndex);
             this.SetPosition(position);
         }
 
@@ -33,10 +36,10 @@ namespace AutomatonBuilder.Entities.Graphics.Memories
             this.SetPosition(this.position);
         }
 
-        public void ChangeWord(string word, int currentIndex)
+        public void ChangeWord(LinkedList<char> memory, int currentIndex)
         {
             this.canvas!.Children.Remove(this.graphicalMemory);
-            this.graphicalMemory = RunningUtils.CreateGraphicalBasicMemory(word, currentIndex);
+            this.graphicalMemory = RunningUtils.CreateGraphicalTuringMemory(memory, currentIndex);
             this.canvas.Children.Add(this.graphicalMemory);
             this.mainEditingScreen!.UpdateLayout();
             this.SyncPosition();

@@ -29,7 +29,7 @@ namespace AutomatonBuilder.Entities.Nodes
             this.Position = node.GetPosition();
             this.Index = node.Index;
             this.Connections = new List<ConnectorBrief>();
-            foreach (var connector in node.ConnectedLinesFromThisNode)
+            foreach (var connector in node.ConnectorsFromThisNode)
             {
                 this.Connections.Add(new ConnectorBrief(connector));
             }

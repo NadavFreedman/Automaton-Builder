@@ -7,6 +7,7 @@ using AutomatonBuilder.Interfaces;
 using AutomatonBuilder.Modals.ConnectionModals;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -24,13 +25,20 @@ namespace AutomatonBuilder.Utils
 
         public static List<ModelNode> DisconnectConnector(AutomatonContext context, IConnector connector)
         {
-            List<ModelNode> disconnectedNodes = new List<ModelNode>();
+            List<ModelNode> disconnectedNodes = new();
 
             foreach (var node in context.NodesList)
             {
-                if (node.ConnectedLinesFromThisNode.ContainsKey(connector) || node.ConnectedLinesToThisNode.ContainsKey(connector))
+                if (node.ConnectorsFromThisNode.ContainsValue(connector))
                 {
-                    node.ConnectedLinesFromThisNode.Remove(connector);
+                    ModelNode otherNode = node.ConnectorsFromThisNode.First(x => x.Value == connector).Key;
+                    node.ConnectorsFromThisNode.Remove(otherNode);
+                    disconnectedNodes.Add(node);
+                }
+                else if (node.ConnectorsToThisNode.ContainsValue(connector))
+                {
+                    ModelNode otherNode = node.ConnectorsToThisNode.First(x => x.Value == connector).Key;
+                    node.ConnectorsToThisNode.Remove(otherNode);
                     disconnectedNodes.Add(node);
                 }
             }
@@ -40,7 +48,7 @@ namespace AutomatonBuilder.Utils
 
         public static NodesConnector ConnectNodeToAnotherNode(Canvas canvas, ModelNode source, ModelNode destination, IConnectorData connectorData, MainEditingScreen? host = null)
         {
-            NodesConnector connector = new NodesConnector(connectorData, source.GetPosition(), destination.GetPosition());
+            NodesConnector connector = new(connectorData, source.GetPosition(), destination.GetPosition());
 
             connector.SetTextPosition();
             connector.AddToCanvasButtom(canvas);
@@ -48,8 +56,8 @@ namespace AutomatonBuilder.Utils
             if (host is not null)
                 connector.BindConnectorToMainWindow(host);
 
-            source.ConnectedLinesFromThisNode[connector] = destination;
-            destination.ConnectedLinesToThisNode[connector] = source;
+            source.ConnectorsFromThisNode[destination] = connector;
+            destination.ConnectorsToThisNode[source] = connector;
 
             return connector;
         }
@@ -62,7 +70,7 @@ namespace AutomatonBuilder.Utils
             if (host is not null)
                 connector.BindConnectorToMainWindow(host);
 
-            node.ConnectedLinesFromThisNode[connector] = node;
+            node.ConnectorsFromThisNode[node] = connector;
 
             return connector;
         }
@@ -74,29 +82,47 @@ namespace AutomatonBuilder.Utils
                 Header = "Remove",
                 Tag = connector
             };
+            MenuItem editConnector = new MenuItem
+            {
+                Header = "Edit...",
+                Tag = connector
+            };
             removeConnector.Click += host.RemoveConnector_Click;
+            editConnector.Click += host.EditConnector_Click;
             connectorElement.ContextMenu = new ContextMenu();
             connectorElement.ContextMenu.Items.Add(removeConnector);
+            connectorElement.ContextMenu.Items.Add(editConnector);
         }
+
+
 
         public static void AddContextMenuToConnectorText(BorderedText borderedText, MainEditingScreen host, IConnector connector)
         {
-            MenuItem removeConnector = new MenuItem
+            MenuItem removeConnector = new()
             {
                 Header = "Remove",
                 Tag = connector
             };
+            MenuItem editConnector = new()
+            {
+                Header = "Edit...",
+                Tag = connector
+            };
             removeConnector.Click += host.RemoveConnector_Click;
+            editConnector.Click += host.EditConnector_Click;
             var menu = new ContextMenu();
             menu.Items.Add(removeConnector);
+            menu.Items.Add(editConnector);
             borderedText.AttachContextMenu(menu);
         }
 
 
         public static void ReconnectConnector(AutomatonContext context, IConnector connector, ModelNode source, ModelNode? destination = null)
         {
-            source.ConnectedLinesFromThisNode[connector] = destination ?? source;
-            destination?.ConnectedLinesToThisNode.Add(connector, source);
+            if (destination is null)
+                destination = source;
+            source.ConnectorsFromThisNode[destination] = connector;
+            destination.ConnectorsToThisNode[source] = connector;
             connector.AddToCanvasButtom(context.MainCanvas);
         }
 
@@ -140,12 +166,29 @@ namespace AutomatonBuilder.Utils
                     return new PushdownConnectorModal(from, to);
 
                 case AutomatonTypes.Turing:
-                    return new BasicConnectorModal(from, to);
+                    return new TuringConnectorModal(from, to);
 
                 default:
                     throw new Exception("Unknown automaton type");
             }
         }
 
+        public static IConnectionModal CreateConnectionModal(AutomatonTypes type, string from, string to, IConnectorData currentData)
+        {
+            switch (type)
+            {
+                case AutomatonTypes.Basic:
+                    return new BasicConnectorModal(from, to, currentData);
+
+                case AutomatonTypes.Pushdown:
+                    return new PushdownConnectorModal(from, to, currentData);
+
+                case AutomatonTypes.Turing:
+                    return new TuringConnectorModal(from, to, currentData);
+
+                default:
+                    throw new Exception("Unknown automaton type");
+            }
+        }
     }
 }

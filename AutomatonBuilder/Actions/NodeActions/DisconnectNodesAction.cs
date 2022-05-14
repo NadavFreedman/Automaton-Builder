@@ -17,6 +17,7 @@ namespace AutomatonBuilder.Actions.NodeActions
         private readonly IConnector connector;
         private List<ModelNode>? disconnectedNodes;
 
+        public bool CanceledAction { get; set; } = false;
         public DisconnectNodesAction(AutomatonContext context, IConnector connector)
         {
             this.context = context;

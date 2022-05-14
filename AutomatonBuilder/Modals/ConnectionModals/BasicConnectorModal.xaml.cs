@@ -27,6 +27,17 @@ namespace AutomatonBuilder.Modals.ConnectionModals
             InstructionsBlock.Text = string.Format("Connect Between {0} to {1}:", from, to);
         }
 
+        public BasicConnectorModal(string from, string to, IConnectorData connectorData)
+        {
+            InitializeComponent();
+            InstructionsBlock.Text = string.Format("Connect Between {0} to {1}:", from, to);
+            BasicAutomatonData basicData = (BasicAutomatonData)connectorData;
+            singleDataList = new List<SingleBasicData>();
+            var tempDataList = new List<SingleBasicData>(basicData.Data);
+            foreach (var item in tempDataList)
+                InsertNewEntryToStack(item);
+        }
+
         private void AddBtn_Click(object sender, RoutedEventArgs e)
         {
             this.ConnectorData = new BasicAutomatonData(singleDataList);

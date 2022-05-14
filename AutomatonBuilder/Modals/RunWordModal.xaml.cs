@@ -19,7 +19,8 @@ namespace AutomatonBuilder.Modals
     /// </summary>
     public partial class RunWordModal : Window
     {
-        public string EnteredWord { get; set; }
+        public string EnteredWord { get; private set; }
+        public int DelayInMilliseconds { get; private set; }
         public RunWordModal()
         {
             InitializeComponent();
@@ -41,6 +42,7 @@ namespace AutomatonBuilder.Modals
         private void RunBtn_Click(object sender, RoutedEventArgs e)
         {
             this.EnteredWord = this.InputBox.Text;
+            this.DelayInMilliseconds = (int)(double.Parse(this.DelayBox.Text) * 1000);
             DialogResult = true;
         }
     }

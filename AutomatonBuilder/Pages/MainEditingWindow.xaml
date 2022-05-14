@@ -93,19 +93,48 @@
                     </Image.Style>
                 </Image>
             </Button>
+            <Button x:Name="ToggleAutoRunBtn" Click="TogglePausePlayBtn_Click" ToolTip="Pause" IsEnabled="False">
+                <Image Source="\Icons\PausePlayIcon.png" Width="20">
+                    <Image.Style>
+                        <Style TargetType="Image">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.5" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Image.Style>
+                </Image>
+            </Button>
+            <Button x:Name="StepBtn" Click="StepBtn_Click" ToolTip="Step" IsEnabled="False">
+                <Image Source="\Icons\StepIcon.png" Width="20">
+                    <Image.Style>
+                        <Style TargetType="Image">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.5" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Image.Style>
+                </Image>
+            </Button>
+            <Button x:Name="AbortBtn" Click="AbortBtn_Click" ToolTip="Abort" IsEnabled="False">
+                <Image Source="\Icons\AbortIcon.png" Width="20">
+                    <Image.Style>
+                        <Style TargetType="Image">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.5" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Image.Style>
+                </Image>
+            </Button>
         </ToolBar>
-        <Canvas x:Name="MemoryCanvas" Canvas.Top="800" Width="2000" Height="200">
-            
-        </Canvas>
     </Canvas>
     <Page.Resources>
-        <Style x:Key="ImageEnabled" TargetType="Image">
-            <Style.Triggers>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Opacity" Value="0.25"></Setter>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
         <Style x:Key="MyFocusVisual">
             <Setter Property="Control.Template">
                 <Setter.Value>

@@ -1,4 +1,5 @@
-﻿using AutomatonBuilder.Interfaces;
+﻿using AutomatonBuilder.Entities.Graphics.Memories;
+using AutomatonBuilder.Interfaces;
 using AutomatonBuilder.Utils;
 using System;
 using System.Collections.Generic;
@@ -13,18 +14,30 @@ namespace AutomatonBuilder.Entities.AutomatonMemories
     {
         private Stack<char> stackMemory;
         private readonly string word;
+
+        private readonly GraphicalBasicMemory graphicalWord;
+        private readonly GraphicalStackMemory graphicalStack;
+
+
         public int CurrentIndex { get; set; }
 
-        public StackMemory(string word, int index = 0, Stack<char> memory = null)
+        public StackMemory(string word, GraphicalBasicMemory graphicalWord, GraphicalStackMemory graphicalStack)
         {
-            if (memory is null)
-                this.stackMemory = new Stack<char>();
-            else
-                this.stackMemory = new Stack<char>(new Stack<char>(memory));
+            this.stackMemory = new Stack<char>();
             this.word = word;
-            this.CurrentIndex = index;
+            this.CurrentIndex = 0;
+            this.graphicalWord = graphicalWord;
+            this.graphicalStack = graphicalStack;
         }
 
+        public StackMemory(StackMemory origin)
+        {
+            this.stackMemory = new Stack<char>(new Stack<char>(origin.stackMemory));
+            this.word = origin.word;
+            this.CurrentIndex = origin.CurrentIndex;
+            this.graphicalWord = origin.graphicalWord;
+            this.graphicalStack = origin.graphicalStack;
+        }
 
         public char GetCurrentWordValue()
         {
@@ -55,7 +68,7 @@ namespace AutomatonBuilder.Entities.AutomatonMemories
 
         public IAutomatonMemory Clone()
         {
-            return new StackMemory(word, this.CurrentIndex, this.stackMemory);
+            return new StackMemory(this);
         }
 
         public bool IsDetermenistic()
@@ -68,14 +81,10 @@ namespace AutomatonBuilder.Entities.AutomatonMemories
             return true;
         }
 
-        public void PrintMemroy(Canvas memoryCanvas)
+        public void PrintMemroy()
         {
-            memoryCanvas.Children.Clear();
-            Border basicContainer = RunningUtils.CreateGraphicalBasicMemory(this.word, this.CurrentIndex);
-            Border stackContainer = RunningUtils.CreateGraphicalStackMemory(this.stackMemory);
-            Canvas.SetLeft(stackContainer, 1000);
-            memoryCanvas.Children.Add(basicContainer);
-            memoryCanvas.Children.Add(stackContainer);
+            this.graphicalStack.UpdateStack(this.stackMemory);
+            this.graphicalWord.ChangeWord(this.word, this.CurrentIndex);
         }
     }
 }

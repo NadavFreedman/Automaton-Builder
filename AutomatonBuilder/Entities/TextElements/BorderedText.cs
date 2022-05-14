@@ -53,6 +53,7 @@ namespace AutomatonBuilder.Entities.TextElements
         {
             this.Block.Text = text;
             this.formattedText = TextUtils.CreateFormattedText(this.Block);
+            this.SetPosition(this.position);
         }
 
         public string GetText()

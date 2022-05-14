@@ -8,6 +8,7 @@ namespace AutomatonBuilder.Actions.MovementActions
         private readonly IMoveable movedElement;
         private Point leftClickHoldStartingPosition;
         private Point leftClickHoldReleasePosition;
+        public bool CanceledAction { get; set; } = false;
 
         public MoveElementAction(IMoveable borderedText, Point leftClickHoldStartingPosition, Point leftClickHoldReleasePosition)
         {

@@ -19,6 +19,8 @@ namespace AutomatonBuilder.Actions.NodeActions
         private readonly MainEditingScreen host;
         private readonly ModelNode node;
 
+        public bool CanceledAction { get; set; } = false;
+
         public RemoveNodeAction(AutomatonContext context, MainEditingScreen host, ModelNode node)
         {
             this.context = context;

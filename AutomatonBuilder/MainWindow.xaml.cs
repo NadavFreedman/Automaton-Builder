@@ -49,6 +49,7 @@ namespace AutomatonBuilder
             Page page = new MainSelectionWindow(this);
             this.WindowState = WindowState.Normal;
             this.Content = page;
+            this.Title = "Model Builder";
         }
     }
 }

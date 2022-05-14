@@ -1,4 +1,5 @@
 ﻿using AutomatonBuilder.Entities.Enums;
+using AutomatonBuilder.Entities.Graphics.Memories;
 using AutomatonBuilder.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -8,31 +9,34 @@ namespace AutomatonBuilder.Entities.AutomatonMemories
 {
     public class TuringMemory : IAutomatonMemory
     {
-        private LinkedList<char > memory;
+        private readonly LinkedList<char> memory;
+        private int currentIndex;
+        private readonly GraphicalTuringMemory graphicalMemory;
+
         public LinkedListNode<char> CurrentNode { get; set; }
 
-        public TuringMemory(string word)
+        public TuringMemory(string word, GraphicalTuringMemory graphicalMemory)
         {
             this.memory = new LinkedList<char>(word);
             this.CurrentNode = new LinkedList<char>(word).First!;
+            this.currentIndex = 1;
             this.memory.AddFirst('├');
+            this.graphicalMemory = graphicalMemory;
         }
 
-        public TuringMemory(LinkedListNode<char> currentNode)
+        public TuringMemory(TuringMemory origin)
         {
-            this.CurrentNode = currentNode;
-            this.memory = this.CurrentNode.List!;
+            this.memory = new LinkedList<char>(origin.memory);
+            this.currentIndex = origin.currentIndex;
+            this.CurrentNode = this.memory.First;
+            for (int i = 0; i < this.currentIndex; i++)
+                this.CurrentNode = this.CurrentNode!.Next;
+            this.graphicalMemory = origin.graphicalMemory;
         }
 
         public IAutomatonMemory Clone()
         {
-            var list = new LinkedList<char>(this.memory);
-            var currentIndex = IndexOf(this.memory, this.CurrentNode);
-            var currentNode = list.First;
-            for (int i = 0; i < currentIndex; i++)
-                currentNode = currentNode!.Next;
-
-            return new TuringMemory(currentNode!);
+            return new TuringMemory(this);
         }
 
         public void WriteAndMove(char newValue, TuringActions direction)
@@ -43,24 +47,15 @@ namespace AutomatonBuilder.Entities.AutomatonMemories
                 if (this.CurrentNode.Next == null)
                     this.memory.AddAfter(this.CurrentNode, '△');
                 this.CurrentNode = this.CurrentNode.Next;
+                this.currentIndex++;
             }
             else
             {
                 if (this.CurrentNode.Previous!.Value == '├')
                     throw new Exception("Tried to move out of turing list bounds");
                 this.CurrentNode = this.CurrentNode.Previous;
+                this.currentIndex--;
             }
-        }
-
-        public static int IndexOf<T>(LinkedList<T> list, LinkedListNode<T> nodeToFind)
-        {
-            var count = 0;
-            for (var node = list.First; node != null; node = node.Next, count++)
-            {
-                if (nodeToFind == node)
-                    return count;
-            }
-            return -1;
         }
 
         public bool IsLastCharacter()
@@ -78,9 +73,9 @@ namespace AutomatonBuilder.Entities.AutomatonMemories
             return false;
         }
 
-        public void PrintMemroy(Canvas memoryCanvas)
+        public void PrintMemroy()
         {
-            throw new NotImplementedException();
+            graphicalMemory.ChangeWord(memory, this.currentIndex);
         }
     }
 }

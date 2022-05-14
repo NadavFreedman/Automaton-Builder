@@ -20,11 +20,11 @@ namespace AutomatonBuilder.Entities.Connectors
         [JsonProperty("connected_to")]
         public string ConnectedTo { get; set; }
 
-        public ConnectorBrief(KeyValuePair<IConnector, ModelNode> connector)
+        public ConnectorBrief(KeyValuePair<ModelNode, IConnector> connector)
         {
-            this.ConnectorData = connector.Key.ConnectorData;
-            this.ConnectedTo = connector.Value.ToString();
-            if (connector.Key is IMoveable moveableConnector)
+            this.ConnectorData = connector.Value.ConnectorData;
+            this.ConnectedTo = connector.Key.ToString();
+            if (connector.Value is IMoveable moveableConnector)
                 this.Position = moveableConnector.GetPosition();
         }
 

@@ -10,6 +10,7 @@ namespace AutomatonBuilder.Actions.DrawingActions
     {
         private readonly Polyline line;
         private readonly AutomatonContext context;
+        public bool CanceledAction { get; set; } = false;
 
         public DeleteLineAction(AutomatonContext context, Polyline line)
         {

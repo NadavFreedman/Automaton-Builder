@@ -15,11 +15,13 @@ using AutomatonBuilder.Actions.MovementActions;
 using AutomatonBuilder.Actions.DrawingActions;
 using AutomatonBuilder.Utils;
 using AutomatonBuilder.Entities.Contexts;
+using AutomatonBuilder.Entities.Runners;
 using AutomatonBuilder.Entities.Args;
 using AutomatonBuilder.Entities.Enums;
 using AutomatonBuilder.Modals;
 using AutomatonBuilder.Entities.AutomatonMemories;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 
 namespace AutomatonBuilder
 {
@@ -30,13 +32,15 @@ namespace AutomatonBuilder
     {
 
         public AutomatonContext context;
+        private readonly AutomatonRunner runner;
         private readonly MainWindow host;
 
         public MainEditingScreen(MainWindow host, AutomatonTypes type = AutomatonTypes.Basic)
         {
             InitializeComponent();
-            this.context = new AutomatonContext(this.MainCanvas, this, type);
+            this.context = new(this.MainCanvas, this, type);
             this.host = host;
+            this.runner = new();
         }
 
         private void AddNodeMenuItem_Click(object sender, RoutedEventArgs e)
@@ -56,16 +60,17 @@ namespace AutomatonBuilder
             ModelNode connectFrom = (ModelNode)((MenuItem)sender).Tag;
             ModelNode connectTo = ConnectorUtils.GetNodeByName(this.context, ((MenuItem)sender).Header.ToString()!);
 
-            IConnectionModal connectorInputWindow = ConnectorUtils.CreateConnectionModal(this.context.type, connectFrom.ToString(), connectTo.ToString());
-            connectorInputWindow.ShowDialog();
-            IConnectorData input;
-            if (connectorInputWindow.DialogResult == true)
-                input = connectorInputWindow.ConnectorData!;
+            if (connectFrom.ConnectorsFromThisNode.ContainsKey(connectTo))
+            {
+                IAction connectAction = new EditConnectionAction(this.context, connectFrom, connectTo);
+                DoAction(connectAction);
+            }
             else
-                return;
-
-            IAction connectAction = new ConnectNodesAction(this.context, connectFrom, connectTo, input, this);
-            DoAction(connectAction);
+            {
+                IAction connectAction = new ConnectNodesAction(this.context, connectFrom, connectTo, this);
+                DoAction(connectAction);
+            }
+            
         }
 
         public void RemoveConnector_Click(object sender, RoutedEventArgs e)
@@ -73,6 +78,13 @@ namespace AutomatonBuilder
             IConnector connector = (IConnector)((MenuItem)sender).Tag;
             IAction disconnectAction = new DisconnectNodesAction(this.context, connector);
             DoAction(disconnectAction);
+        }
+
+        public void EditConnector_Click(object sender, RoutedEventArgs e)
+        {
+            IConnector connector = (IConnector)((MenuItem)sender).Tag;
+            IAction editConnectionAction = new EditConnectionAction(this.context, connector);
+            DoAction(editConnectionAction);
         }
 
         public void RemoveText_Click(object sender, RoutedEventArgs e)
@@ -175,9 +187,9 @@ namespace AutomatonBuilder
             {
                 if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
                 {
-                    if (e.Key == Key.Z && this.context.DoneActionsStack.Count != 0) //Undo
+                    if (e.Key == Key.Z && this.context.DoneActionsStack.Count != 0)
                         UndoBtn_Click(null, null);
-                    else if (e.Key == Key.Y && this.context.UndoneActionsStack.Count != 0) //Redo
+                    else if (e.Key == Key.Y && this.context.UndoneActionsStack.Count != 0)
                         RedoBtn_Click(null, null);
                     else if (e.Key == Key.S) //Save
                         SaveBtn_Click(null, null);
@@ -199,6 +211,22 @@ namespace AutomatonBuilder
                     {
                         this.FontSizeComboBox.SelectedIndex = Math.Max(this.FontSizeComboBox.SelectedIndex - 1, 0);
                     }
+                }
+                else if (e.Key == Key.F5 && (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)))
+                {
+                    AbortBtn_Click(null, null);
+                }
+                else if (e.Key == Key.F5)
+                {
+                    PlayBtn_ClickAsync(null, null);
+                }
+                else if (e.Key == Key.F9)
+                {
+                    TogglePausePlayBtn_Click(null, null);
+                }
+                else if (Keyboard.IsKeyDown(Key.F10))
+                {
+                    StepBtn_Click(null, null);
                 }
             }
         }
@@ -264,6 +292,8 @@ namespace AutomatonBuilder
                 actionToUndo.UndoAction();
                 this.context.UndoneActionsStack.Push(actionToUndo);
                 this.RedoBtn.IsEnabled = true;
+                if (this.context.DoneActionsStack.Count == 0)
+                    this.ChangeTitle(this.host.Title[0..(this.host.Title.Length - 1)]);
             }
             if (this.context.DoneActionsStack.Count == 0)
             {
@@ -277,6 +307,8 @@ namespace AutomatonBuilder
             {
                 IAction actionToRedo = this.context.UndoneActionsStack.Pop();
                 actionToRedo.RedoAction();
+                if (this.context.DoneActionsStack.Count == 0)
+                    this.ChangeTitle(this.host.Title + "*");
                 this.context.DoneActionsStack.Push(actionToRedo);
                 this.UndoBtn.IsEnabled = true;
             }
@@ -289,10 +321,13 @@ namespace AutomatonBuilder
         private void DoAction(IAction action)
         {
             action.DoAction();
+            if (action.CanceledAction) return;
             this.context.DoneActionsStack.Push(action);
             this.context.UndoneActionsStack.Clear();
             this.RedoBtn.IsEnabled = false;
             this.UndoBtn.IsEnabled = true;
+            if (!this.host.Title.EndsWith("*"))
+                this.host.Title += "*";
         }
 
         private void ColorPicker_SelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color?> e)
@@ -316,19 +351,74 @@ namespace AutomatonBuilder
 
         private void BackBtn_Click(object sender, RoutedEventArgs e)
         {
+            if (this.context.DoneActionsStack.Count != 0)
+            {
+                MessageBoxResult messageBoxResult = MessageBox.Show("You have unsaved changes. Are you sure you want to exit?", "Exit Confirmation", MessageBoxButton.YesNo);
+                if (messageBoxResult == MessageBoxResult.No)
+                    return;
+            }
             this.host.GoToMenu();
         }
 
         private async void PlayBtn_ClickAsync(object sender, RoutedEventArgs e)
         {
+            if (this.runner.IsRunning) return;
+
             RunWordModal wordModal = new();
             if (wordModal.ShowDialog() == false) return;
 
-            bool result = await RunningUtils.Run(this.context.StartingNode!, RunningUtils.CreateMemory(this.context.type, wordModal.EnteredWord), this.MemoryCanvas);
+            this.runner.IsRunning = true;
+            this.EanableButtons();
+
+            bool result = await runner.Run(this.context.StartingNode!, runner.CreateMemory(this.context.type, wordModal.EnteredWord, this), wordModal.DelayInMilliseconds);
             if (result)
                 MessageBox.Show($"The word was accepted!");
             else
                 MessageBox.Show($"The word wasn't accepted!");
+
+            this.runner.IsRunning = false;
+            this.EanableButtons();
+        }
+
+        private void StepBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.runner.IsRunning && !this.runner.IsAutoRun)
+                this.runner.Step();
+        }
+
+        private void TogglePausePlayBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (!this.runner.IsRunning) return;
+            if (this.runner.IsAutoRun)
+            {
+                this.runner.Pause();
+                this.ToggleAutoRunBtn.ToolTip = "Continue";
+            }
+            else
+            {
+                this.runner.Continue();
+                this.ToggleAutoRunBtn.ToolTip = "Pause";
+            }
+            this.StepBtn.IsEnabled = !this.runner.IsAutoRun;
+        }
+
+        private void AbortBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.runner.IsRunning)
+                this.runner.Abort();
+        }
+
+        private void EanableButtons()
+        {
+            this.PlayBtn.IsEnabled = !this.runner.IsRunning;
+            this.ToggleAutoRunBtn.IsEnabled = this.runner.IsRunning;
+            this.StepBtn.IsEnabled = !this.runner.IsAutoRun && this.runner.IsRunning;
+            this.AbortBtn.IsEnabled = this.runner.IsRunning;
+        }
+
+        public void ChangeTitle(string newTitle)
+        {
+            this.host.Title = newTitle;
         }
     }
 }

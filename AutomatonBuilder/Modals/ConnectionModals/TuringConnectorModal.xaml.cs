@@ -34,6 +34,17 @@ namespace AutomatonBuilder.Modals.ConnectionModals
             InstructionsBlock.Text = string.Format("Connect Between {0} to {1}:", from, to);
         }
 
+        public TuringConnectorModal(string from, string to, IConnectorData connectorData)
+        {
+            InitializeComponent();
+            InstructionsBlock.Text = string.Format("Connect Between {0} to {1}:", from, to);
+            TuringAutomatonData turingData = (TuringAutomatonData)connectorData;
+            singleDataList = new List<SingleTuringData>();
+            var tempDataList = new List<SingleTuringData>(turingData.Data);
+            foreach (var item in tempDataList)
+                InsertNewEntryToStack(item);
+        }
+
         private void ReadValueBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             this.TuringInput(this.ReadValueBox);
@@ -85,6 +96,7 @@ namespace AutomatonBuilder.Modals.ConnectionModals
         {
             if (this.DoneBtn.IsEnabled)
             {
+                AddBtn_Click(null, null);
                 this.ConnectorData = new TuringAutomatonData(singleDataList);
                 this.DialogResult = true;
             }
@@ -188,6 +200,21 @@ namespace AutomatonBuilder.Modals.ConnectionModals
             {
                 inputBox.Text = "△";
             }
+        }
+
+        private void ReadValueBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            this.InfoBlock.Text = "Read Value: The letter needed to move to the connected node.\nSpecial Characters: \"|\" for \"├\", Space for \"△\"";
+        }
+
+        private void WriteActionBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            this.InfoBlock.Text = "Write Value: The letter that will be written to this node upon moving.\nSpecial Characters: \"|\" for \"├\", Space for \"△\"";
+        }
+
+        private void ActionTuringkBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            this.InfoBlock.Text = "Action: Move right or left. Choose using the arrows.";
         }
     }
 }

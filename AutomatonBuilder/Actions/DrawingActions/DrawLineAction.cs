@@ -17,6 +17,7 @@ namespace AutomatonBuilder.Actions.DrawingActions
         private readonly Polyline drawnLine;
         private readonly MainEditingScreen host;
         private readonly AutomatonContext context;
+        public bool CanceledAction { get; set; } = false;
 
         public DrawLineAction(AutomatonContext context, MainEditingScreen host)
         {
