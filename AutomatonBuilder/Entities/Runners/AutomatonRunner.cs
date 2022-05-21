@@ -1,5 +1,6 @@
 ﻿using AutomatonBuilder.Entities.AutomatonMemories;
 using AutomatonBuilder.Entities.Enums;
+using AutomatonBuilder.Entities.Exceptions;
 using AutomatonBuilder.Entities.Graphics.Memories;
 using AutomatonBuilder.Interfaces;
 using System;
@@ -119,7 +120,7 @@ namespace AutomatonBuilder.Entities.Runners
                     this.graphicalTuringMemory.ChangeWord(new LinkedList<char>("├" + word), 1);
                     return new TuringMemory(word, graphicalTuringMemory);
                 default:
-                    throw new Exception("Unsupported type");
+                    throw new BuilderUnsupportedTypeException("Unsupported type");
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿using AutomatonBuilder.Entities.Enums;
+using AutomatonBuilder.Entities.Exceptions;
 using AutomatonBuilder.Entities.Graphics.Memories;
 using AutomatonBuilder.Interfaces;
 using System;
@@ -46,14 +47,14 @@ namespace AutomatonBuilder.Entities.AutomatonMemories
             {
                 if (this.CurrentNode.Next == null)
                     this.memory.AddAfter(this.CurrentNode, '△');
-                this.CurrentNode = this.CurrentNode.Next;
+                this.CurrentNode = this.CurrentNode.Next!;
                 this.currentIndex++;
             }
             else
             {
-                if (this.CurrentNode.Previous!.Value == '├')
-                    throw new Exception("Tried to move out of turing list bounds");
-                this.CurrentNode = this.CurrentNode.Previous;
+                if (this.CurrentNode.Value == '├')
+                    throw new BuilderInvalidActionException("Tried to move out of turing list bounds");
+                this.CurrentNode = this.CurrentNode.Previous!;
                 this.currentIndex--;
             }
         }

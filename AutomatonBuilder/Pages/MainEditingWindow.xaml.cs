@@ -22,6 +22,7 @@ using AutomatonBuilder.Modals;
 using AutomatonBuilder.Entities.AutomatonMemories;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
+using AutomatonBuilder.Entities.Exceptions;
 
 namespace AutomatonBuilder
 {
@@ -277,7 +278,7 @@ namespace AutomatonBuilder
                         SavingUtils.SaveAsEaf(this, saveFileDialog.FileName);
                         break;
                     default:
-                        throw new Exception("Invalid file format");
+                        throw new BuilderInvalidActionException("Tried to save in an invalid file format");
                 }
             }
 

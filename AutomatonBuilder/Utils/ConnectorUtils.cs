@@ -2,6 +2,7 @@
 using AutomatonBuilder.Entities.Connectors;
 using AutomatonBuilder.Entities.Contexts;
 using AutomatonBuilder.Entities.Enums;
+using AutomatonBuilder.Entities.Exceptions;
 using AutomatonBuilder.Entities.TextElements;
 using AutomatonBuilder.Interfaces;
 using AutomatonBuilder.Modals.ConnectionModals;
@@ -133,7 +134,7 @@ namespace AutomatonBuilder.Utils
                 if (node.ToString() == nodeName)
                     return node;
             }
-            throw new Exception($"No node with the name {nodeName}");
+            throw new BuilderNotFoundException($"No node with the name {nodeName}");
         }
 
         public static double GetAlpha(Point a, Point b)
@@ -169,7 +170,7 @@ namespace AutomatonBuilder.Utils
                     return new TuringConnectorModal(from, to);
 
                 default:
-                    throw new Exception("Unknown automaton type");
+                    throw new BuilderUnsupportedTypeException("Unknown automaton type");
             }
         }
 
@@ -187,7 +188,7 @@ namespace AutomatonBuilder.Utils
                     return new TuringConnectorModal(from, to, currentData);
 
                 default:
-                    throw new Exception("Unknown automaton type");
+                    throw new BuilderUnsupportedTypeException("Unknown automaton type");
             }
         }
     }
